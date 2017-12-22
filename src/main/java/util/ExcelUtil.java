@@ -25,9 +25,7 @@ import exception.ImportExcelException;
 
 public class ExcelUtil {
 
-
-
-	  /**
+	/**
 	   * Abre um arquivo de acordo com a url passada.
 	   * 
 	   * @param urlFile
@@ -64,14 +62,6 @@ public class ExcelUtil {
 	      throw new ImportExcelException("Falha ao processar arquivo.");
 	    }
 	  }
-
-	  /**
-	   * Executa processo de fechamento de arquivo.
-	   */
-	  public static void fecharArquivo(OPCPackage pkg, Workbook workbook) {
-	    pkg = null;
-	    workbook = null;
-	  }
 	  
 	  /**
 	   * Recupera aba pelo nome.
@@ -97,12 +87,7 @@ public class ExcelUtil {
 	  }
 	  
 	  public static String getCellText(Workbook workbook, Row row, int cellIndex) {
-		  Cell cell = row.getCell(cellIndex);
-		    if (cell != null) {
-		    	return cell.getRichStringCellValue().getString();
-		    }
-		    
-		    return StringUtils.EMPTY;
+		  return getCellValueGeneric(workbook, row, cellIndex).toString();
 	  }
 	  /**
 	   * Obtém o valor da célula independente do tipo de célula.
