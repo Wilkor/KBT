@@ -2,13 +2,11 @@ package model;
 
 import java.util.List;
 
-import org.json.JSONObject;
-
 /**
  * @author Keila Lacerda
  *
  */
-public class EntityValue {
+public class EntityValue implements Comparable<EntityValue> {
 	private String name;
 	private List<String> synonyms;
 	private boolean main;
@@ -32,14 +30,7 @@ public class EntityValue {
 		this.main = main;
 	}
 	
-	@Override
-	public String toString() {
-		JSONObject j = new JSONObject();
-		
-		j.put("name", this.getName());
-		j.put("main", this.isMain());
-		
-		return j.toString();
-		
+	public int compareTo(EntityValue entityValue) {
+		return this.name.compareTo(entityValue.getName());
 	}
 }

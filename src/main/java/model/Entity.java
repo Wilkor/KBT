@@ -1,6 +1,6 @@
 package model;
 
-import java.util.List;
+import java.util.Set;
 
 /**
  * @author Keila Lacerda
@@ -8,7 +8,7 @@ import java.util.List;
  */
 public class Entity {
 	private String name;
-	private List<EntityValue> values;
+	private Set<EntityValue> values;
 	
 	public String getName() {
 		return name;
@@ -16,10 +16,10 @@ public class Entity {
 	public void setName(String name) {
 		this.name = name;
 	}
-	public List<EntityValue> getValues() {
+	public Set<EntityValue> getValues() {
 		return values;
 	}
-	public void setValues(List<EntityValue> values) {
+	public void setValues(Set<EntityValue> values) {
 		this.values = values;
 	}
 	
