@@ -20,6 +20,7 @@ import model.EntityValue;
 import model.Intention;
 import model.KnowledgeBase;
 import util.ExcelUtil;
+import validator.EntityValidator;
 
 /**
  * @author Keila Lacerda
@@ -71,14 +72,24 @@ public class ExcelExtractor {
 				
 				if(row != null) {
 					EntityValue entityValue = new EntityValue();
+					
 					entityValue.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
+					
 					entityValue.setSynonyms(ExcelUtil.getValuesTextBetweenColumns(workbook, row, ExtratorConstants.SINONIMOS_CELL_BEGIN, ExtratorConstants.SINONIMOS_CELL_END));
-				
+					
+					entityValue.setEntity(new Entity(entityValue.getName()));
+					
+					entityValue.setCategory(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CATEGORY_VALUE));
+					
 					mapEntityValues.put(entityValue.getName(), entityValue);
+					
+					kB.add(entityValue);
 				}
 			}
 			
 			kB.setMapEntityValues(mapEntityValues);
+			EntityValidator evalid = new EntityValidator();
+			evalid.validate(kB);
 		}
 		
 	}
