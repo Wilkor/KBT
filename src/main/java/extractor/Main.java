@@ -13,7 +13,7 @@ public class Main {
    {
        try {
     	   	ExcelExtractor excelExtractor = new ExcelExtractor();
-   			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\ZUP\\Santander\\ChatBots\\20171219_Base de conhecimento - Cartões, Canais, Conta, Segurança.xlsx");
+   			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
 
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
