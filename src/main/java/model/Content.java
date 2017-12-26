@@ -10,6 +10,7 @@ public class Content {
 	private Intention intention;
 	private List<EntityValue> entityValues;
 	private String value;
+	private boolean intermediate;
 	
 	public Intention getIntention() {
 		return intention;
@@ -29,5 +30,11 @@ public class Content {
 	public void setValue(String value) {
 		this.value = value;
 	}
-		
+	public boolean isIntermediate() {
+		return intermediate;
+	}
+	public void setIntermediate(boolean intermediate) {
+		this.intermediate = intermediate;
+	}
+	
 }
