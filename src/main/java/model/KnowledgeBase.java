@@ -12,7 +12,7 @@ public class KnowledgeBase {
 	private Map<String, EntityValue> mapEntityValues;
 	private Map<String, Intention> mapIntentions;
 	private Map<String, Entity> mapEntities;
-	List<Content> contentList;
+	private List<Content> contentList;
 	
 	public Map<String, EntityValue> getMapEntityValues() {
 		return mapEntityValues;
