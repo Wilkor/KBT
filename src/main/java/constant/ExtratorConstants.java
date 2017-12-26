@@ -24,6 +24,7 @@ public final class ExtratorConstants {
 	public static final int CELL_INDEX_EXAMPLE = 1;
 	public static final int CELL_INDEX_CONTENT_INTENTION = 1;
 	public static final int CELL_INDEX_CONTENT_RESPOSTA = 6;
+	public static final int CELL_INDEX_CONTENT_RESPOSTA_INTERMEDIARIA = 7;
 	
 	/*
 	 * Begin an End cell interval
@@ -32,4 +33,9 @@ public final class ExtratorConstants {
 	public static final int SINONIMOS_CELL_END = 6;
 	public static final int ENTITIES_VALUE_CONTENT_CELL_BEGIN = 2;
 	public static final int ENTITIES_VALUE_CONTENT_CELL_END = 5;
+	
+	/*
+	 * OTHERS
+	 */
+	public static final String NAO = "Não";
 }
