@@ -17,9 +17,9 @@ public class Main {
    {
        try {
     	   	ExcelExtractor excelExtractor = new ExcelExtractor();
-   			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\ZUP\\Santander\\ChatBots\\kb.xlsx");
+   			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
    			Gson gson = new Gson();
-   			gson.toJson(kb, new FileWriter("C:\\ZUP\\Santander\\ChatBots\\fileKBT.json"));
+   			gson.toJson(kb, new FileWriter("C:\\fileKBT.json"));
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
