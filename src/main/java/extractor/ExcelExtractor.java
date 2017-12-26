@@ -6,6 +6,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -74,7 +75,7 @@ public class ExcelExtractor {
 					entityValue.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
 					entityValue.setSynonyms(ExcelUtil.getValuesTextBetweenColumns(workbook, row, ExtratorConstants.SINONIMOS_CELL_BEGIN, ExtratorConstants.SINONIMOS_CELL_END));
 				
-					mapEntityValues.put(entityValue.getName(), entityValue);
+					mapEntityValues.put(StringUtils.lowerCase(entityValue.getName()), entityValue);
 				}
 			}
 			
@@ -107,10 +108,10 @@ public class ExcelExtractor {
 						entity = new Entity();
 						entity.setName(entityName);
 						entity.setValues(new HashSet<EntityValue>());
-						mapEntities.put(entityName, entity);
+						mapEntities.put(StringUtils.lowerCase(entityName), entity);
 					}
 					
-					mapEntities.get(entityName).getValues().add(kb.getMapEntityValues().get(entityValueName));
+					mapEntities.get(StringUtils.lowerCase(entityName)).getValues().add(kb.getMapEntityValues().get(StringUtils.lowerCase(entityValueName)));
 				}
 			}
 		}
@@ -143,10 +144,10 @@ public class ExcelExtractor {
 						intention = new Intention();
 						intention.setName(intentionName);
 						intention.setExamples(new ArrayList<String>());
-						mapIntentions.put(intentionName, intention);
+						mapIntentions.put(StringUtils.lowerCase(intentionName), intention);
 					}
 					
-					mapIntentions.get(intentionName).getExamples().add(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
+					mapIntentions.get(StringUtils.lowerCase(intentionName)).getExamples().add(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
 				}
 			}
 		}
@@ -194,7 +195,7 @@ public class ExcelExtractor {
 		  
 		  if(workbook != null && row != null) {
 			  for (int i = ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_BEGIN; i <= ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_END; i++) {
-				  listReturn.add(mapEntityValues.get(ExcelUtil.getCellText(workbook, row, i)));				
+				  listReturn.add(mapEntityValues.get(StringUtils.lowerCase(ExcelUtil.getCellText(workbook, row, i))));				
 			}
 		  }
 		return listReturn;
