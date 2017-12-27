@@ -1,5 +1,6 @@
 package model;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -7,20 +8,47 @@ import java.util.List;
  *
  */
 public class Intention {
-	private String name;
-	private List<String> examples;
 	
+	private String name;
+	
+	private List<String> examples;
+
+	private List<Entity> entities;
+	
+	public Intention() {
+		this.entities = new ArrayList<>();
+	}
+	
+	public Intention(String name) {
+		this.name = name;
+	}
+	
+	public void add(Entity entity) {
+		this.entities.add(entity);
+	}
+	
+	public List<Entity> getEntities() {
+		return entities;
+	}
+
+	public void setEntities(List<Entity> entities) {
+		this.entities = entities;
+	}
+
 	public String getName() {
 		return name;
 	}
+
 	public void setName(String name) {
 		this.name = name;
 	}
+
 	public List<String> getExamples() {
 		return examples;
 	}
+
 	public void setExamples(List<String> examples) {
 		this.examples = examples;
 	}
-	
+
 }

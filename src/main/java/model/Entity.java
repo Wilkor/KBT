@@ -7,14 +7,30 @@ import java.util.Set;
  *
  */
 public class Entity {
+
 	private String name;
+
 	private Set<EntityValue> values;
+
+	private String key;
 
 	public Entity() {
 	}
 
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
 	public Entity(String name) {
 		this.name = name;
+	}
+	public Entity(String name, String key) {
+		this.name = name;
+		this.key = key;
 	}
 
 	public String getName() {

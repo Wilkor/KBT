@@ -18,7 +18,8 @@ public class EntityValidator {
 		try {
 
 			List<EntityValue> entityValues = kb.getEntityValues();
-			List<EntityValue> entityInCat = new ArrayList<EntityValue>();
+			
+			List<EntityValue> entityInCat = new ArrayList<>();
 
 			if (entityValues.size() > 0) {
 
@@ -26,15 +27,14 @@ public class EntityValidator {
 						.forEach(entityInCat::add);
 				
 				entityInCat.forEach(e -> {
-					LOGGER.info("Entity (" + e.getName() + ") in category");
-//					System.out.println("Entity (" + e.getName() + ") in category");
+					LOGGER.info("Entity (" + e.getName() + ") in category", e.getName(), e);
 				});
 
 			} else {
 				LOGGER.info("Entities equals 0");
 			}
 		} catch (Exception e) {
-			LOGGER.error("Error on validate", e.getStackTrace());
+			LOGGER.error("Error on validate", e.getMessage(), e);
 		}
 	}
 

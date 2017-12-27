@@ -21,8 +21,8 @@ public class KnowledgeBase {
 	private List<EntityValue> entityValues;
 
 	public KnowledgeBase() {
-		this.entityValues = new ArrayList<EntityValue>();
-		this.contentList = new ArrayList<Content>();
+		this.entityValues = new ArrayList<>();
+		this.contentList = new ArrayList<>();
 	}
 
 	public List<EntityValue> getEntityValues() {

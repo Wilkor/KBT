@@ -7,11 +7,15 @@ import java.util.List;
  *
  */
 public class EntityValue implements Comparable<EntityValue> {
-	private String name;
-	private List<String> synonyms;
-	private boolean main;
-	private String category;
 	
+	private String name;
+	
+	private List<String> synonyms;
+	
+	private boolean main;
+	
+	private String category;
+
 	public String getCategory() {
 		return category;
 	}
