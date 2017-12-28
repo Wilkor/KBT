@@ -1,11 +1,12 @@
 package extractor;
 
-import java.text.Normalizer;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -221,6 +222,13 @@ public class ExcelExtractor {
 					content.setEntityValues(getEntityValuesContent(row, kb.getMapEntityValues()));
 					
 					content.getIntention().setEntities(getEntityContent(row, content.getIntention()));
+					
+					if (content.getIntention().getEntities().size() == 0) {
+						content.getIntention().setKey(StringUtil.removeSpecialCharacters(content.getIntention().getName()));
+					} else {
+						content.getIntention().setKey(makeKey(content.getIntention().getEntities(), content.getIntention()));
+					}
+					
 
 					contentList.add(content);
 				}
@@ -255,15 +263,22 @@ public class ExcelExtractor {
 		if (workbook != null && row != null) {
 			for (int i = ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_BEGIN; i <= ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_END; i++) {
 				
-				String entity = StringUtils.lowerCase(ExcelUtil.getCellText(workbook, row, i));
+				String entity = StringUtils.lowerCase(ExcelUtil.getCellText(workbook, row, i)).trim();
 				
 				if (entity != null && !entity.equals("")) {
-					ret.add(new Entity(entity,  StringUtil.removeSpecialCharacters(intention.getName()) + "_" + StringUtil.removeSpecialCharacters(entity.replace(" ", "_"))));
+					ret.add(new Entity(entity, StringUtil.removeSpecialCharacters(entity.replace(" ", ""))));
 				}
 				
 			}
 		}
 		return ret;
+	}
+	
+	
+	private static String makeKey(List<Entity> entities, Intention i) {
+	    return i.getName().toLowerCase() + "_" + entities.stream()
+	            .map( n -> n.getKey() )
+	            .collect( Collectors.joining( "_" ) );
 	}
 
 }

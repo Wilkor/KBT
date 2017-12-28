@@ -15,6 +15,8 @@ public class Intention {
 
 	private List<Entity> entities;
 	
+	private String key;
+	
 	public Intention() {
 		this.entities = new ArrayList<>();
 	}
@@ -23,6 +25,14 @@ public class Intention {
 		this.name = name;
 	}
 	
+	public String getKey() {
+		return key;
+	}
+
+	public void setKey(String key) {
+		this.key = key;
+	}
+
 	public void add(Entity entity) {
 		this.entities.add(entity);
 	}
