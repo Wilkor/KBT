@@ -11,9 +11,9 @@ public class Intention {
 	
 	private String name;
 	
-	private List<String> examples;
+	private transient List<String> examples;
 
-	private List<Entity> entities;
+	private transient List<Entity> entities;
 	
 	private String key;
 	
