@@ -1,16 +1,11 @@
 package extractor;
 
-import java.io.FileWriter;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
-import com.google.gson.Gson;
-
 import controller.KBTLoadController;
 import model.Intention;
-import model.KnowledgeBase;
 import service.HttpService;
 import setting.KBTSettings;
 

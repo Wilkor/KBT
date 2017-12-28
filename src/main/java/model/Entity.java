@@ -12,7 +12,7 @@ public class Entity {
 
 	private Set<EntityValue> values;
 
-	private String key;
+	private transient String key;
 
 	public Entity() {
 	}

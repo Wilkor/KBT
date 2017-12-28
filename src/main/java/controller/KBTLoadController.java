@@ -1,26 +1,19 @@
 package controller;
 
-import java.net.URI;
 import java.util.Map;
 
 import javax.inject.Inject;
 
 import org.limeprotocol.Command;
 import org.limeprotocol.Command.CommandMethod;
-import org.limeprotocol.Document;
 import org.limeprotocol.EnvelopeId;
 import org.limeprotocol.JsonDocument;
 import org.limeprotocol.LimeUri;
 import org.limeprotocol.MediaType;
-import org.limeprotocol.MediaType.SubTypes;
 import org.limeprotocol.Node;
-import org.limeprotocol.messaging.contents.Input;
-import org.limeprotocol.messaging.resources.Presence;
+import org.limeprotocol.messaging.contents.PlainText;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.deser.DefaultDeserializationContext;
-import com.fasterxml.jackson.databind.ext.DOMDeserializer.DocumentDeserializer;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -86,8 +79,11 @@ public class KBTLoadController {
 	 */
 	public void loadContent(Content content) {
 		Command command = createCommandSet(content);
+		//TODO O que concatenar na URI????
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI));
-		command.setResource(getJsonDocument(content, MediaTypeEnum.RESOURCE.getMediaTypeLime()));
+		
+		PlainText text = new PlainText(content.getValue());
+		command.setResource(text);
 
 		this.httpService.post(command);
 	}

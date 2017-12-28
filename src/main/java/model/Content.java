@@ -9,13 +9,13 @@ import java.util.List;
  */
 public class Content {
 	
-	private Intention intention;
+	private transient Intention intention;
 	
-	private List<EntityValue> entityValues;
+	private transient List<EntityValue> entityValues;
 	
 	private String value;
 	
-	private boolean intermediate;
+	private transient boolean intermediate;
 
 	
 	public Content() {
