@@ -40,6 +40,14 @@ public class HttpService {
 		return response.getStatusCode();
 	}
 	
+	public HttpStatus get(Envelope envelope) {
+
+
+		ResponseEntity<Object> response = restTemplate.getForEntity(KBTSettings.BLIP_COMMAND_ENDPOINT, Object.class);
+
+		return response.getStatusCode();
+	}
+	
 	private void init() {
 		this.headers = new HttpHeaders();
 		headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));

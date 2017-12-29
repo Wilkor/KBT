@@ -1,21 +1,11 @@
 package controller;
 
-import java.util.Map;
-
 import javax.inject.Inject;
 
 import org.limeprotocol.Command;
-import org.limeprotocol.Command.CommandMethod;
-import org.limeprotocol.EnvelopeId;
-import org.limeprotocol.JsonDocument;
 import org.limeprotocol.LimeUri;
-import org.limeprotocol.MediaType;
-import org.limeprotocol.Node;
 import org.limeprotocol.messaging.contents.PlainText;
 import org.springframework.stereotype.Component;
-
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
 
 import enums.MediaTypeEnum;
 import model.Content;
@@ -23,6 +13,7 @@ import model.Entity;
 import model.Intention;
 import service.HttpService;
 import setting.KBTSettings;
+import util.BlipServiceUtil;
 
 /**
  * Classe responsável por controlar o Load dos dados da base de conhecimento no Blip
@@ -52,9 +43,9 @@ public class KBTLoadController {
 	 */
 	public void loadIntention(Intention intention) {
 
-		Command command = createCommandSet(intention);
+		Command command = BlipServiceUtil.createCommandSet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_INTENT_URI));
-		command.setResource(getJsonDocument(intention, MediaTypeEnum.INTENTION.getMediaTypeLime()));
+		command.setResource(BlipServiceUtil.getJsonDocument(intention, MediaTypeEnum.INTENTION.getMediaTypeLime()));
 
 		this.httpService.post(command);
 	}
@@ -65,9 +56,9 @@ public class KBTLoadController {
 	 * @param entity
 	 */
 	public void loadEntity(Entity entity) {
-		Command command = createCommandSet(entity);
+		Command command = BlipServiceUtil.createCommandSet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_ENTITY_URI));
-		command.setResource(getJsonDocument(entity, MediaTypeEnum.ENTITY.getMediaTypeLime()));
+		command.setResource(BlipServiceUtil.getJsonDocument(entity, MediaTypeEnum.ENTITY.getMediaTypeLime()));
 
 		this.httpService.post(command);
 	}
@@ -78,7 +69,7 @@ public class KBTLoadController {
 	 * @param content
 	 */
 	public void loadContent(Content content) {
-		Command command = createCommandSet(content);
+		Command command = BlipServiceUtil.createCommandSet();
 		//TODO O que concatenar na URI????
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI));
 		
@@ -88,39 +79,10 @@ public class KBTLoadController {
 		this.httpService.post(command);
 	}
 	
-	/**
-	 * Cria um comando set para o Blip preenchendo os atributos comuns.
-	 * 
-	 * @param object
-	 * @return
-	 */
-	private Command createCommandSet(Object object) {
-		Command command = new Command(EnvelopeId.newId());
-		command.setId(EnvelopeId.newId());
-		command.setTo(Node.parse(KBTSettings.BLIP_ADDRESS_AI));
-		command.setMethod(CommandMethod.SET);
-		
-		return command;
+	public void getIntentions() {
+		Command command = BlipServiceUtil.createCommandGet();
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_TOP10_URI));
 	}
 	
-	/**
-	 * Cria e preenche um JsonDocument a partir de um objeto.
-	 * 
-	 * @param objeto
-	 * @param mediaType
-	 * @return
-	 */
-	private JsonDocument getJsonDocument( Object objeto, MediaType mediaType){
-		
-		Gson gson = new Gson();
-		String objectJson = gson.toJson(objeto);
-		
-		Map<String, Object> map = gson.fromJson(objectJson,new TypeToken<Map<String, String>>(){}.getType());
-		
-		JsonDocument doc = new JsonDocument(map, new MediaType(MediaType.DiscreteTypes.Application, MediaType.SubTypes.JSON));
-		doc.setMediaType(MediaTypeEnum.INTENTION.getMediaTypeLime());
-		
-		return doc;
-		
-	}
+	
 }
