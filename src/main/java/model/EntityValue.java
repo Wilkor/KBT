@@ -15,8 +15,10 @@ public class EntityValue implements Comparable<EntityValue> {
 	
 	@JsonProperty("synonymous")
 	private List<String> synonyms;
+	
 	@JsonIgnore
 	private boolean main;
+	
 	@JsonIgnore
 	private String category;
 

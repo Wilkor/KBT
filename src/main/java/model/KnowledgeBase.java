@@ -1,6 +1,7 @@
 package model;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,14 @@ public class KnowledgeBase {
 
 	public KnowledgeBase() {
 		this.entityValues = new ArrayList<>();
+		
 		this.contentList = new ArrayList<>();
+		
+		this.mapEntities = new HashMap<String, Entity>();
+		
+		this.mapEntityValues = new HashMap<String, EntityValue>();
+		
+		this.mapIntentions = new HashMap<String, Intention>();
 	}
 
 	public List<EntityValue> getEntityValues() {

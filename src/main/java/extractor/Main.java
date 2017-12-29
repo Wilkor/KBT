@@ -1,7 +1,6 @@
 package extractor;
 
 import java.io.FileWriter;
-
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -9,17 +8,18 @@ import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.client.RestTemplate;
 
 import com.google.gson.Gson;
+
 import controller.KBTLoadController;
 import model.Content;
 import model.Entity;
 import model.EntityValue;
 import model.Intention;
+import model.KnowledgeBase;
 import service.HttpService;
 import setting.KBTSettings;
-
-import model.KnowledgeBase;
 
 public class Main {
 
@@ -30,8 +30,10 @@ public class Main {
        try {
     	   	ExcelExtractor excelExtractor = new ExcelExtractor();
    			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
-   			Gson gson = new Gson();
-   			gson.toJson(kb, new FileWriter("C:\\fileKBT.json"));
+   		
+   			
+//   			Gson gson = new Gson();
+//   			gson.toJson(kb, new FileWriter("C:\\fileKBT.json"));
     	   
 //    	   KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
 //    	   

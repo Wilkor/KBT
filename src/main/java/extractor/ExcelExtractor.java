@@ -1,12 +1,10 @@
 package extractor;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -250,7 +248,7 @@ public class ExcelExtractor {
 					content.setEntityValues(getEntityValuesContent(row, kb.getMapEntityValues()));
 
 					content.getIntention().setEntities(getEntityContent(row, content.getIntention()));
-					
+
 					content.getIntention().setExamples(extractExamples(content.getIntention()));
 
 					if (content.getIntention().getEntities().size() == 0) {
