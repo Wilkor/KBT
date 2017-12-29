@@ -54,14 +54,15 @@ public class Main {
 	   HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
 	   KBTLoadController controller = new KBTLoadController(httpService );
 	   
-	   Entity entity = new Entity("Entity 8", "key 8");
+	   Entity entity = new Entity("Entity 9", "key 9");
 	   Set<EntityValue> values = new HashSet<>();
 	   EntityValue e = new EntityValue();
 	   e.setCategory("test cat");
 	   List<String> synonyms = new ArrayList<>();
-	   synonyms.add("SIN 8");
-	   synonyms.add("sin 7");
+	   synonyms.add("sin 11");
+	   synonyms.add("sin 12");
 	   e.setSynonyms(synonyms);
+	   e.setName("Val 1");
 	   values.add(e);
 	   entity.setValues(values);
 	   controller.loadEntity(entity);

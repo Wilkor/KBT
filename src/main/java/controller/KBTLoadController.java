@@ -81,6 +81,7 @@ public class KBTLoadController {
 	
 	public void getIntentions() {
 		Command command = BlipServiceUtil.createCommandGet();
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_TOP10_URI));
 	}
 	
 	
