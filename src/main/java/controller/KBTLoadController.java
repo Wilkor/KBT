@@ -43,7 +43,7 @@ public class KBTLoadController {
 	 */
 	public void loadIntention(Intention intention) {
 
-		Command command = BlipServiceUtil.createCommandSet(intention);
+		Command command = BlipServiceUtil.createCommandSet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_INTENT_URI));
 		command.setResource(BlipServiceUtil.getJsonDocument(intention, MediaTypeEnum.INTENTION.getMediaTypeLime()));
 
@@ -56,7 +56,7 @@ public class KBTLoadController {
 	 * @param entity
 	 */
 	public void loadEntity(Entity entity) {
-		Command command = BlipServiceUtil.createCommandSet(entity);
+		Command command = BlipServiceUtil.createCommandSet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_ENTITY_URI));
 		command.setResource(BlipServiceUtil.getJsonDocument(entity, MediaTypeEnum.ENTITY.getMediaTypeLime()));
 
@@ -69,7 +69,7 @@ public class KBTLoadController {
 	 * @param content
 	 */
 	public void loadContent(Content content) {
-		Command command = BlipServiceUtil.createCommandSet(content);
+		Command command = BlipServiceUtil.createCommandSet();
 		//TODO O que concatenar na URI????
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI));
 		
@@ -80,7 +80,7 @@ public class KBTLoadController {
 	}
 	
 	public void getIntentions() {
-		
+		Command command = BlipServiceUtil.createCommandGet();
 	}
 	
 	

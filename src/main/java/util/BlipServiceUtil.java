@@ -24,11 +24,10 @@ public class BlipServiceUtil {
 	/**
 	 * Cria um comando set para o Blip preenchendo os atributos comuns.
 	 * 
-	 * @param object
 	 * @return
 	 */
-	public static Command createCommandSet(Object object) {
-		Command command = createCommand(object);
+	public static Command createCommandSet() {
+		Command command = createCommand();
 		command.setMethod(CommandMethod.SET);
 		
 		return command;
@@ -37,11 +36,10 @@ public class BlipServiceUtil {
 	/**
 	 * Cria um comando set para o Blip preenchendo os atributos comuns.
 	 * 
-	 * @param object
 	 * @return
 	 */
-	public static Command createCommandGet(Object object) {
-		Command command = createCommand(object);
+	public static Command createCommandGet() {
+		Command command = createCommand();
 		command.setMethod(CommandMethod.GET);
 		
 		return command;
@@ -50,10 +48,9 @@ public class BlipServiceUtil {
 	/**
 	 * Cria um comando set para o Blip preenchendo os atributos comuns.
 	 * 
-	 * @param object
 	 * @return
 	 */
-	public static Command createCommand(Object object) {
+	public static Command createCommand() {
 		Command command = new Command(EnvelopeId.newId());
 		command.setId(EnvelopeId.newId());
 		command.setTo(Node.parse(KBTSettings.BLIP_ADDRESS_AI));
