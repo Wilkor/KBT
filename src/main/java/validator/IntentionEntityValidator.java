@@ -1,7 +1,6 @@
 package validator;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -21,11 +20,9 @@ public class IntentionEntityValidator {
 
 	private final static Logger LOGGER = LoggerFactory.getLogger(IntentionEntityValidator.class);
 
-	public void validate(KnowledgeBase kb) {
+	public boolean validate(KnowledgeBase kb) {
 
 		try {
-
-			List<Intention> uniqueIntentions = new ArrayList<>();
 
 			List<Intention> ints = new ArrayList<>();
 
@@ -33,12 +30,17 @@ public class IntentionEntityValidator {
 				ints.add(c.getIntention());
 			});
 
-			uniqueIntentions = ints.stream().filter(distinctByKey(Intention::getName))
-					.sorted((a, b) -> a.getName().compareToIgnoreCase(b.getName())).collect(Collectors.toList());
-
 			List<Intention> broken = new ArrayList<>();
+			
+			List<Intention> withoutExamples = new ArrayList<>();
+			
 			for (Intention intention : ints) {
 				Predicate<Intention> p = e -> e.getKey().equals(intention.getKey());
+				
+				if (intention.getExamples().size() == 0) {
+					LOGGER.info("Intention (" + intention.getName() + ") without examples ", intention.getName(), intention);
+					withoutExamples.add(intention);
+				}
 				
 				if (intention.getEntities().size() == 1) {
 
@@ -80,9 +82,13 @@ public class IntentionEntityValidator {
 			broken.forEach(b -> {
 				LOGGER.info("Broken itentions and entities " + b.getKey(), b.getKey(), b);
 			});
+			
+			return broken.size() > 0 || withoutExamples.size() > 0;
 
 		} catch (Exception e) {
 			LOGGER.error("Error on validate intention entity", e.getMessage(), e);
+			
+			return false;
 		}
 
 	}

@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
@@ -157,11 +158,12 @@ public class ExcelExtractor {
 				Row row = sheet.getRow(i);
 
 				if (row != null) {
-					String intentionName = ExcelUtil.getCellText(workbook, row,
-							ExtratorConstants.CELL_INDEX_INTENTION_NAME);
+					String intentionName = ExcelUtil
+							.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_INTENTION_NAME).trim()
+							.toLowerCase();
 					Intention intention = null;
 
-					// Se a inten��o ainda n�o estiver no map cria e adiciona
+					// Se a intencao ainda nao estiver no map cria e adiciona
 					if (!mapIntentions.containsKey(intentionName)) {
 						intention = new Intention();
 						intention.setName(intentionName);
@@ -178,14 +180,42 @@ public class ExcelExtractor {
 		kb.setMapIntentions(mapIntentions);
 	}
 
+	public List<String> extractExamples(Intention intention) throws ImportExcelException {
+
+		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_INTENTION);
+
+		List<String> examples = null;
+
+		if (sheet != null) {
+			examples = new ArrayList<>();
+
+			for (int i = 1; i <= sheet.getPhysicalNumberOfRows(); i++) {
+				Row row = sheet.getRow(i);
+
+				if (row != null) {
+
+					String currentIntention = ExcelUtil
+							.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_INTENTION_NAME).trim()
+							.toLowerCase();
+
+					if (intention.getName().trim().toLowerCase().equals(currentIntention)) {
+						examples.add(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
+					}
+				}
+			}
+		}
+
+		return examples;
+	}
+
 	/**
 	 * @param kb
 	 * @throws ImportExcelException
 	 */
 	public void extractContent(KnowledgeBase kb) throws ImportExcelException {
-		
+
 		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_CONTENT);
-		
+
 		List<Content> contentList = new ArrayList<>();
 
 		if (sheet != null) {
@@ -197,11 +227,9 @@ public class ExcelExtractor {
 
 				if (row != null) {
 					Content content = new Content();
-					
-//					content.setIntention(kb.getMapIntentions()
-//							.get(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_INTENTION)));
-					
-					content.setIntention(new Intention(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_INTENTION)));
+
+					content.setIntention(new Intention(
+							ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_INTENTION)));
 
 					// TODO VALIDAR questao pergunta intermediaria
 					String intermediateResponse = ExcelUtil.getCellText(workbook, row,
@@ -209,26 +237,29 @@ public class ExcelExtractor {
 
 					if (StringUtils.isEmpty(intermediateResponse)
 							|| intermediateResponse.equalsIgnoreCase(ExtratorConstants.NAO)) {
-						
+
 						content.setValue(
 								ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA));
-						
+
 						content.setIntermediate(false);
 					} else {
 						content.setValue(intermediateResponse);
 						content.setIntermediate(true);
 					}
-					
+
 					content.setEntityValues(getEntityValuesContent(row, kb.getMapEntityValues()));
-					
+
 					content.getIntention().setEntities(getEntityContent(row, content.getIntention()));
 					
+					content.getIntention().setExamples(extractExamples(content.getIntention()));
+
 					if (content.getIntention().getEntities().size() == 0) {
-						content.getIntention().setKey(StringUtil.removeSpecialCharacters(content.getIntention().getName()));
+						content.getIntention()
+								.setKey(StringUtil.removeSpecialCharacters(content.getIntention().getName()));
 					} else {
-						content.getIntention().setKey(makeKey(content.getIntention().getEntities(), content.getIntention()));
+						content.getIntention()
+								.setKey(makeKey(content.getIntention().getEntities(), content.getIntention()));
 					}
-					
 
 					contentList.add(content);
 				}
@@ -236,7 +267,7 @@ public class ExcelExtractor {
 		}
 
 		kb.setContentList(contentList);
-		
+
 		IntentionEntityValidator val = new IntentionEntityValidator();
 		val.validate(kb);
 	}
@@ -256,29 +287,27 @@ public class ExcelExtractor {
 		}
 		return listReturn;
 	}
-	
+
 	private List<Entity> getEntityContent(Row row, Intention intention) {
 		List<Entity> ret = new ArrayList<Entity>();
 
 		if (workbook != null && row != null) {
 			for (int i = ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_BEGIN; i <= ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_END; i++) {
-				
+
 				String entity = StringUtils.lowerCase(ExcelUtil.getCellText(workbook, row, i)).trim();
-				
+
 				if (entity != null && !entity.equals("")) {
 					ret.add(new Entity(entity, StringUtil.removeSpecialCharacters(entity.replace(" ", ""))));
 				}
-				
+
 			}
 		}
 		return ret;
 	}
-	
-	
+
 	private static String makeKey(List<Entity> entities, Intention i) {
-	    return i.getName().toLowerCase() + "_" + entities.stream()
-	            .map( n -> n.getKey() )
-	            .collect( Collectors.joining( "_" ) );
+		return i.getName().toLowerCase() + "_"
+				+ entities.stream().map(n -> n.getKey()).collect(Collectors.joining("_"));
 	}
 
 }
