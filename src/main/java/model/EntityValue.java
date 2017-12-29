@@ -2,7 +2,8 @@ package model;
 
 import java.util.List;
 
-import com.google.gson.annotations.SerializedName;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * @author Keila Lacerda
@@ -12,12 +13,12 @@ public class EntityValue implements Comparable<EntityValue> {
 	
 	private String name;
 	
-	@SerializedName("synonymous")
+	@JsonProperty("synonymous")
 	private List<String> synonyms;
-	
-	private transient boolean main;
-	
-	private transient String category;
+	@JsonIgnore
+	private boolean main;
+	@JsonIgnore
+	private String category;
 
 	public String getCategory() {
 		return category;

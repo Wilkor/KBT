@@ -3,19 +3,22 @@ package model;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Keila Lacerda
  *
  */
 public class Content {
 	
-	private transient Intention intention;
-	
-	private transient List<EntityValue> entityValues;
+	@JsonIgnore
+	private Intention intention;
+	@JsonIgnore
+	private List<EntityValue> entityValues;
 	
 	private String value;
-	
-	private transient boolean intermediate;
+	@JsonIgnore
+	private boolean intermediate;
 
 	
 	public Content() {

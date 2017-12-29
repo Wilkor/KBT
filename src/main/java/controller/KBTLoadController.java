@@ -1,5 +1,6 @@
 package controller;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.inject.Inject;
@@ -14,8 +15,8 @@ import org.limeprotocol.Node;
 import org.limeprotocol.messaging.contents.PlainText;
 import org.springframework.stereotype.Component;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import enums.MediaTypeEnum;
 import model.Content;
@@ -112,13 +113,12 @@ public class KBTLoadController {
 	 */
 	private JsonDocument getJsonDocument( Object objeto, MediaType mediaType){
 		
-		Gson gson = new Gson();
-		String objectJson = gson.toJson(objeto);
-		
-		Map<String, Object> map = gson.fromJson(objectJson,new TypeToken<Map<String, String>>(){}.getType());
-		
+		ObjectMapper oMapper = new ObjectMapper();
+		TypeReference<HashMap<String,Object>> typeRef = new TypeReference<HashMap<String,Object>>() {};
+		 Map<String, Object> map = oMapper.convertValue(objeto, typeRef);
+		 
 		JsonDocument doc = new JsonDocument(map, new MediaType(MediaType.DiscreteTypes.Application, MediaType.SubTypes.JSON));
-		doc.setMediaType(MediaTypeEnum.INTENTION.getMediaTypeLime());
+		doc.setMediaType(mediaType);
 		
 		return doc;
 		

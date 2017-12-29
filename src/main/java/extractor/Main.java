@@ -1,10 +1,18 @@
 package extractor;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
 import controller.KBTLoadController;
+import model.Content;
+import model.Entity;
+import model.EntityValue;
 import model.Intention;
 import service.HttpService;
 import setting.KBTSettings;
@@ -21,18 +29,57 @@ public class Main {
 //   			Gson gson = new Gson();
 //   			gson.toJson(kb, new FileWriter("C:\\fileKBT.json"));
     	   
-    	   KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
     	   
-    	   HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-    	   KBTLoadController controller = new KBTLoadController(httpService );
-    	   Intention intention = new Intention();
-    	   intention.setName("Teste I3");
-    	   controller.loadIntention(intention);
+    	   loadEntity();
     	   
     	   
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
         }
+   }
+   
+   private static void loadIntention() {
+	   KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
+	   
+	   HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
+	   KBTLoadController controller = new KBTLoadController(httpService );
+	   Intention intention = new Intention();
+	   intention.setName("Teste I4");
+	   controller.loadIntention(intention);
+   }
+   
+   private static void loadEntity() {
+	   KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
+	   
+	   HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
+	   KBTLoadController controller = new KBTLoadController(httpService );
+	   
+	   Entity entity = new Entity("Entity 8", "key 8");
+	   Set<EntityValue> values = new HashSet<>();
+	   EntityValue e = new EntityValue();
+	   e.setCategory("test cat");
+	   List<String> synonyms = new ArrayList<>();
+	   synonyms.add("SIN 8");
+	   synonyms.add("sin 7");
+	   e.setSynonyms(synonyms);
+	   values.add(e);
+	   entity.setValues(values);
+	   controller.loadEntity(entity);
+
+   }
+   
+   private static void loadContent() {
+	   KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
+	   
+	   HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
+	   KBTLoadController controller = new KBTLoadController(httpService );
+	   
+	   Content content = new Content();
+	   content.setValue("Teste Resource");
+	   
+	   controller.loadContent(content);
+
+
    }
     
 }

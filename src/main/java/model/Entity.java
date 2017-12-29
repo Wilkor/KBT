@@ -2,6 +2,8 @@ package model;
 
 import java.util.Set;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 /**
  * @author Keila Lacerda
  *
@@ -12,7 +14,8 @@ public class Entity {
 
 	private Set<EntityValue> values;
 
-	private transient String key;
+	@JsonIgnore
+	private String key;
 
 	public Entity() {
 	}

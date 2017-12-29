@@ -20,7 +20,7 @@ public final class ExtratorConstants {
 	 */
 	public static final int CELL_INDEX_CATEGORY_VALUE = 0;
 	public static final int CELL_INDEX_ENTITY_VALUE = 1;
-	public static final int CELL_INDEX_ENTITY = 0;
+	public static final int CELL_INDEX_ENTITY = 1;
 	public static final int CELL_INDEX_INTENTION_NAME = 2;
 	public static final int CELL_INDEX_EXAMPLE = 1;
 	public static final int CELL_INDEX_CONTENT_INTENTION = 1;
