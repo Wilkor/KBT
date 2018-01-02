@@ -31,12 +31,12 @@ public class HttpService {
 		init();
 	}
 
-	public ResponseEntity<Object> post(Envelope envelope) {
+	public ResponseEntity<String> post(Envelope envelope) {
 
 		String envelopeAsString = new JacksonEnvelopeSerializer().serialize(envelope);
 		HttpEntity<String> entity = new HttpEntity<String>(envelopeAsString, this.headers);
 
-		ResponseEntity<Object> response = restTemplate.postForEntity(KBTSettings.BLIP_COMMAND_ENDPOINT, entity,Object.class);
+		ResponseEntity<String> response = restTemplate.postForEntity(KBTSettings.BLIP_COMMAND_ENDPOINT, entity, String.class);
 
 		return response;
 	}

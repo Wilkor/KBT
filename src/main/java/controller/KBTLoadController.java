@@ -9,15 +9,17 @@ import javax.inject.Inject;
 import org.limeprotocol.Command;
 import org.limeprotocol.LimeUri;
 import org.limeprotocol.messaging.contents.PlainText;
-import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 
 import enums.MediaTypeEnum;
 import model.Content;
@@ -28,7 +30,8 @@ import setting.KBTSettings;
 import util.BlipServiceUtil;
 
 /**
- * Classe responsável por controlar o Load dos dados da base de conhecimento no Blip
+ * Classe responsável por controlar o Load dos dados da base de conhecimento no
+ * Blip
  * 
  * @author Keila Lacerda
  *
@@ -37,7 +40,7 @@ import util.BlipServiceUtil;
 public class KBTLoadController {
 
 	private HttpService httpService;
-	
+
 	/**
 	 * Construtor que recebe um HttpService.
 	 * 
@@ -47,7 +50,7 @@ public class KBTLoadController {
 	public KBTLoadController(HttpService httpService) {
 		this.httpService = httpService;
 	}
-	
+
 	/**
 	 * Realiza o cadastramento de uma Intenção no Blip
 	 * 
@@ -61,7 +64,7 @@ public class KBTLoadController {
 
 		this.httpService.post(command);
 	}
-	
+
 	/**
 	 * Realiza o cadastramento de uma Entidade no Blip
 	 * 
@@ -74,7 +77,7 @@ public class KBTLoadController {
 
 		this.httpService.post(command);
 	}
-	
+
 	/**
 	 * Realiza o cadastramento de um Recurso/Conteúdo no Blip
 	 * 
@@ -82,40 +85,45 @@ public class KBTLoadController {
 	 */
 	public void loadContent(Content content) {
 		Command command = BlipServiceUtil.createCommandSet();
-		//TODO O que concatenar na URI????
+		// TODO O que concatenar na URI????
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI));
-		
+
 		PlainText text = new PlainText(content.getValue());
 		command.setResource(text);
 
 		this.httpService.post(command);
 	}
-	
+
 	@SuppressWarnings("unchecked")
 	public void getIntentions() {
-		//TODO DESCONSIDERA A BAGUNÇA ESTAVA TESTANDO TUDO NO MODO DEBUG, PODE DELETAR METADE DO METODO
-		Command command = BlipServiceUtil.createCommandGet();
-		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_URI));
-		
-		ResponseEntity<Object> response = this.httpService.post(command);
-		Map intentionsList = (Map) response.getBody();
-		Object intentions = ((Map)intentionsList.get("resource")).get("items");
-		
-		System.out.println(response);
-		ObjectMapper oMapper = new ObjectMapper();
-		oMapper.enable(MapperFeature.AUTO_DETECT_CREATORS); 
-//		oMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES); 
-		oMapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true); 
-		
 		try {
-//			new JacksonEnvelopeSerializer().deserialize(intentions.toString());
-			oMapper.readValue(intentions.toString(), new TypeReference<Set<Intention>>() {});
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			Command command = BlipServiceUtil.createCommandGet();
+			command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_URI));
+
+			ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
+
+			if (response.getStatusCode() == HttpStatus.OK) {
+
+				System.out.println(response);
+
+				ObjectMapper objectMapper = new ObjectMapper();
+				objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+
+				objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+				objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+
+				objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+				objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+				
+				model.Command cmd = objectMapper.readValue(response.getBody().toString(), model.Command.class);
+				
+				System.out.println(cmd.getId());
+				
+			}
+		} catch (Exception e) {
 			e.printStackTrace();
 		}
-//		System.out.println(intentions.get(0).getName());
+		// System.out.println(intentions.get(0).getName());
 	}
-	
-	
+
 }
