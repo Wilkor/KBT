@@ -1,53 +1,36 @@
 package model;
 
-import java.util.List;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonView;
 
 public class Command {
-	
-	@JsonProperty("total")
-	private int total;
 
-	@JsonProperty("itemType")
-	private String itemType;
-	
 	@JsonProperty("method")
 	private String method;
-	
+
 	@JsonProperty("status")
 	private String status;
-	
+
 	@JsonProperty("id")
 	private String id;
-	
+
 	@JsonProperty("from")
 	private String from;
-	
+
 	@JsonProperty("pp")
 	private String pp;
-	
+
 	@JsonProperty("to")
 	private String to;
-	
-	@JsonProperty("items")
-	private String item;
 
-	public int getTotal() {
-		return total;
+	@JsonProperty("resource")
+	private Resource resource;
+
+	public Resource getResource() {
+		return resource;
 	}
 
-	public void setTotal(int total) {
-		this.total = total;
-	}
-
-	public String getItemType() {
-		return itemType;
-	}
-
-	public void setItemType(String itemType) {
-		this.itemType = itemType;
+	public void setResource(Resource resource) {
+		this.resource = resource;
 	}
 
 	public String getMethod() {
@@ -98,13 +81,4 @@ public class Command {
 		this.to = to;
 	}
 
-	public String getItem() {
-		return item;
-	}
-
-	public void setItem(String item) {
-		this.item = item;
-	}
-
-	
 }
