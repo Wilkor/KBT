@@ -1,5 +1,6 @@
 package extractor;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -25,9 +26,9 @@ import validator.Validator;
 public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
-	
+
 	private static Validator validator;
-	
+
 	@Inject
 	public Main(Validator validator) {
 		this.validator = validator;
@@ -35,33 +36,22 @@ public class Main {
 
 	public static void main(String[] args) {
 		try {
-			ExcelExtractor excelExtractor = new ExcelExtractor();
-			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
+//			ExcelExtractor excelExtractor = new ExcelExtractor();
+//			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
+//			
+//			if (!validator.validate(kb)) {
+//				LOGGER.info("Can not complete KB import", kb, kb);
+//			}
+			getIntentions();
 			
-			if (!validator.validate(kb)) {
-				LOGGER.info("Can not complete KB import", kb, kb);
-			}
-			
-			// Gson gson = new Gson();
-			// gson.toJson(kb, new FileWriter("C:\\fileKBT.json"));
-
-			// KBTSettings kbtSettings = new
-			// KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-			//
-			// HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-			// KBTLoadController controller = new KBTLoadController(httpService );
-			// Intention intention = new Intention();
-			// intention.setName("Teste I3");
+		} catch (Exception e) {
+            LOGGER.error(e.getMessage());
+        }
 			// controller.loadIntention(intention);
 
-			loadEntity();
+   }
 
-		} catch (Exception e) {
-			LOGGER.error(e.getMessage());
-		}
-	}
-
-	private static void loadIntention() {
+	protected static void loadIntention() {
 		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
 
 		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
@@ -71,7 +61,7 @@ public class Main {
 		controller.loadIntention(intention);
 	}
 
-	private static void loadEntity() {
+	protected static void loadEntity() {
 		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
 
 		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
@@ -92,7 +82,7 @@ public class Main {
 
 	}
 
-	private static void loadContent() {
+	protected static void loadContent() {
 		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
 
 		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
@@ -103,6 +93,16 @@ public class Main {
 
 		controller.loadContent(content);
 
+	}
+
+	protected static void getIntentions() {
+		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
+
+		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
+		KBTLoadController controller = new KBTLoadController(httpService);
+
+		controller.getIntentions();
+		
 	}
 
 }
