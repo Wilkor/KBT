@@ -14,6 +14,7 @@ public class KBTSettings {
 	public final static String BLIP_SET_RESOURCE_URI = "/resources";
 	public final static String BLIP_GET_INTENTIONS_TOP10_URI = "/intentions?$skip=0&$take=10";
 	public final static String BLIP_GET_INTENTIONS_URI = "/intentions?$skip=0";
+	public final static String BLIP_DELETE_INTENTION_URI = "/intentions/";
 	
 	private String blipAuthorizationToken;
 

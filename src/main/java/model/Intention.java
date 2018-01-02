@@ -2,12 +2,19 @@ package model;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
+
+import org.limeprotocol.DocumentBase;
+import org.limeprotocol.MediaType;
 
 /**
  * @author Keila Lacerda
  *
  */
-public class Intention {
+public class Intention  extends DocumentBase {
+	public static String MIME_TYPE = "application/vnd.iris.ai.intention+json";
+	
+	private String id;
 	
 	private String name;
 	
@@ -18,13 +25,36 @@ public class Intention {
 	private String key;
 	
 	public Intention() {
+		super(MediaType.parse(MIME_TYPE));
 		this.entities = new ArrayList<>();
 	}
 	
 	public Intention(String name) {
+		super(MediaType.parse(MIME_TYPE));
 		this.name = name;
 	}
 	
+	@Override
+    public boolean equals(Object o) {
+        if (!(o instanceof Intention)) return false;
+        Intention intention = (Intention) o;
+        return Objects.equals(id, intention.getId());
+    }
+
+    @Override
+    public int hashCode() {
+        int result = id == null || id.isEmpty() ? 0 : id.hashCode();
+        return result;
+    }
+    
+	public String getId() {
+		return id;
+	}
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 	public String getKey() {
 		return key;
 	}

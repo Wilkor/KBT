@@ -1,21 +1,19 @@
 package controller;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.Set;
-
 import javax.inject.Inject;
 
+import org.apache.commons.lang3.StringUtils;
 import org.limeprotocol.Command;
+import org.limeprotocol.Document;
+import org.limeprotocol.Envelope;
 import org.limeprotocol.LimeUri;
 import org.limeprotocol.messaging.contents.PlainText;
+import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -30,7 +28,7 @@ import setting.KBTSettings;
 import util.BlipServiceUtil;
 
 /**
- * Classe responsável por controlar o Load dos dados da base de conhecimento no
+ * Classe responsï¿½vel por controlar o Load dos dados da base de conhecimento no
  * Blip
  * 
  * @author Keila Lacerda
@@ -52,7 +50,7 @@ public class KBTLoadController {
 	}
 
 	/**
-	 * Realiza o cadastramento de uma Intenção no Blip
+	 * Realiza o cadastramento de uma Intenï¿½ï¿½o no Blip
 	 * 
 	 * @param intention
 	 */
@@ -79,7 +77,7 @@ public class KBTLoadController {
 	}
 
 	/**
-	 * Realiza o cadastramento de um Recurso/Conteúdo no Blip
+	 * Realiza o cadastramento de um Recurso/Conteï¿½do no Blip
 	 * 
 	 * @param content
 	 */
@@ -117,7 +115,13 @@ public class KBTLoadController {
 				
 				model.Command cmd = objectMapper.readValue(response.getBody().toString(), model.Command.class);
 				
+//				Envelope envelope = new JacksonEnvelopeSerializer().deserialize(response.getBody().toString());
+//				Command commandResp = (Command)envelope;
+//				Document doc = commandResp.getResource();
+				
 				System.out.println(cmd.getId());
+				
+				
 				
 			}
 		} catch (Exception e) {
@@ -125,5 +129,17 @@ public class KBTLoadController {
 		}
 		// System.out.println(intentions.get(0).getName());
 	}
-
+	
+	/**
+	 * @param idIntention
+	 */
+	public void deleteIntention(String idIntention) {
+		if(!StringUtils.isEmpty(idIntention)) {
+			Command command = BlipServiceUtil.createCommandDelete();
+			command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_INTENTION_URI + idIntention));
+			
+			this.httpService.post(command);
+		}
+	}
+	
 }

@@ -104,5 +104,15 @@ public class Main {
 		controller.getIntentions();
 		
 	}
+	
 
+	protected static void deleteIntention() {
+		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
+
+		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
+		KBTLoadController controller = new KBTLoadController(httpService);
+
+		controller.deleteIntention("order_pizza2");
+		
+	}
 }

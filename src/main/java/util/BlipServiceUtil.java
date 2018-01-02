@@ -77,4 +77,14 @@ public class BlipServiceUtil {
 		return doc;
 		
 	}
+
+	/**
+	 * @return
+	 */
+	public static Command createCommandDelete() {
+		Command command = createCommand();	
+		command.setMethod(CommandMethod.DELETE);
+		
+		return command;
+	}
 }
