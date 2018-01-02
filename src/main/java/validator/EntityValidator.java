@@ -13,7 +13,7 @@ public class EntityValidator {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(EntityValidator.class);
 
-	public void validate(KnowledgeBase kb) {
+	public boolean validate(KnowledgeBase kb) {
 
 		try {
 
@@ -29,12 +29,19 @@ public class EntityValidator {
 				entityInCat.forEach(e -> {
 					LOGGER.info("Entity (" + e.getName() + ") in category", e.getName(), e);
 				});
+				
+				
 
 			} else {
 				LOGGER.info("Entities equals 0");
 			}
+			
+			return entityInCat.size() > 0;
+			
 		} catch (Exception e) {
 			LOGGER.error("Error on validate", e.getMessage(), e);
+			
+			return false;
 		}
 	}
 
