@@ -1,5 +1,6 @@
 package extractor;
 
+import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
@@ -16,13 +17,6 @@ public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-//	private static Validator validator;
-//
-//	@Inject
-//	public Main(Validator validator) {
-//		Main.validator = validator;
-//	}
-
 	public static void main(String[] args) {
 		try {
 			
@@ -34,8 +28,15 @@ public class Main {
 			if (!validator.validate(kb)) {
 				LOGGER.info("Can not complete KB import", kb, kb);
 			}
-//			getAll();
 			
+			//TODO TESTE LOAD
+//			KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
+//
+//			HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
+//			KBTLoadController controller = new KBTLoadController(httpService, new JacksonEnvelopeSerializer());
+//			getAll(controller);
+			
+			//TODO TESTE EXTRATOR
 //			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\ZUP\\Santander\\ChatBots\\kb.xlsx");
 //			Gson gson = new Gson();
 //			gson.toJson(kb, new FileWriter("C:\\ZUP\\Santander\\ChatBots\\fileKBT.json"));
@@ -47,22 +48,17 @@ public class Main {
 
    }
 
-	protected static void loadIntention() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
+	//TODO REMOVER APÓS TESTES
+	protected static void loadIntention(KBTLoadController controller) {
+		
 		Intention intention = new Intention();
 		intention.setName("Teste I4");
 		controller.loadIntention(intention);
 	}
 
-	protected static void loadEntity() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-
+	//TODO REMOVER APÓS TESTES
+	protected static void loadEntity(KBTLoadController controller) {
+		
 //		Entity entity = new Entity("Entity 9", "key 9");
 //		Set<EntityValue> values = new HashSet<>();
 //		EntityValue e = new EntityValue();
@@ -78,12 +74,9 @@ public class Main {
 
 	}
 
-	protected static void loadContent() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-
+	//TODO REMOVER APÓS TESTES
+	protected static void loadContent(KBTLoadController controller) {
+		
 		Content content = new Content();
 		content.setValue("Teste Resource");
 
@@ -91,17 +84,15 @@ public class Main {
 
 	}
 
-	protected static void getAll() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-
-//		controller.getIntentions();
-		controller.getEntities();		
+	//TODO REMOVER APÓS TESTES
+	protected static void getAll(KBTLoadController controller) {
+		
+		controller.getIntentions();
+//		controller.getEntities();		
 	}
 	
 
+	//TODO REMOVER APÓS TESTES
 	protected static void deleteOne() {
 		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
 

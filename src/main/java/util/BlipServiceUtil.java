@@ -1,14 +1,19 @@
 package util;
 
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.limeprotocol.Command;
+import org.limeprotocol.Command.CommandMethod;
+import org.limeprotocol.Document;
+import org.limeprotocol.DocumentCollection;
+import org.limeprotocol.Envelope;
 import org.limeprotocol.EnvelopeId;
 import org.limeprotocol.JsonDocument;
 import org.limeprotocol.MediaType;
 import org.limeprotocol.Node;
-import org.limeprotocol.Command.CommandMethod;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -86,5 +91,16 @@ public class BlipServiceUtil {
 		command.setMethod(CommandMethod.DELETE);
 		
 		return command;
+	}
+	
+	/**
+	 * @param envelope
+	 * @return
+	 */
+	public static List<Document> getItemsDocumentFromEnvelope(Envelope envelope){
+		Command commandResp = (Command)envelope;
+		DocumentCollection doc = (DocumentCollection) commandResp.getResource();
+		
+		return Arrays.asList(doc.getItems());
 	}
 }

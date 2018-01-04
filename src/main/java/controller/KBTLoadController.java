@@ -1,6 +1,7 @@
 package controller;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -8,8 +9,13 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.limeprotocol.Command;
+import org.limeprotocol.DocumentCollection;
+import org.limeprotocol.Envelope;
 import org.limeprotocol.LimeUri;
+import org.limeprotocol.messaging.Registrator;
 import org.limeprotocol.messaging.contents.PlainText;
+import org.limeprotocol.serialization.EnvelopeSerializer;
+import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -39,6 +45,8 @@ public class KBTLoadController {
 
 	private HttpService httpService;
 
+	private EnvelopeSerializer serializer;
+	
 	/**
 	 * Construtor que recebe um HttpService.
 	 * 
@@ -49,6 +57,20 @@ public class KBTLoadController {
 		this.httpService = httpService;
 	}
 
+	@Inject
+	public KBTLoadController(HttpService httpService, EnvelopeSerializer serializer) {
+		this.httpService = httpService;
+		this.serializer = serializer;
+	}
+	
+	/**
+	 * 
+	 */
+	public void init() {
+		Registrator.registerDocuments();
+		net.take.iris.messaging.Registrator.registerDocuments();
+	}
+	
 	/**
 	 * Percorre toda a lista de Intentions inserindo no Blip e atualizando o id
 	 * 
@@ -142,41 +164,47 @@ public class KBTLoadController {
 		return null;
 	}
 
-	public void getIntentions() {
-		try {
-			Command command = BlipServiceUtil.createCommandGet();
-			command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_URI));
+	/**
+	 * @return
+	 */
+	public List<Intention> getIntentions() {
+		Command command = BlipServiceUtil.createCommandGet();
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
 
-			ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
-
-			if (response.getStatusCode() == HttpStatus.OK) {
-
-				System.out.println(response);
-
-				ObjectMapper objectMapper = new ObjectMapper();
-				objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-
-				objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-				objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-
-				objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
-				objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-				
-				model.Command cmd = objectMapper.readValue(response.getBody().toString(), model.Command.class);
-				
-//				Envelope envelope = new JacksonEnvelopeSerializer().deserialize(response.getBody().toString());
-//				Command commandResp = (Command)envelope;
-//				Document doc = commandResp.getResource();
-				
-				System.out.println(cmd.getId());
-				
-				
-				
-			}
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		// System.out.println(intentions.get(0).getName());
+		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
+		Envelope envelope = serializer.deserialize(response.getBody().toString());
+		
+		return (List<Intention>)(List<?>) BlipServiceUtil.getItemsDocumentFromEnvelope(envelope);	
+		
+		//TODO REMOVER
+//		try {
+//			Command command = BlipServiceUtil.createCommandGet();
+//			command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_URI));
+//
+//			ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
+//
+//			if (response.getStatusCode() == HttpStatus.OK) {
+//
+//				System.out.println(response);
+//
+//				ObjectMapper objectMapper = new ObjectMapper();
+//				objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
+//
+//				objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
+//				objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
+//
+//				objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
+//				objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
+//				
+//				model.Command cmd = objectMapper.readValue(response.getBody().toString(), model.Command.class);
+//
+//				System.out.println(cmd.getId());
+//				
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
+			
 	}
 	
 	/**
@@ -191,14 +219,18 @@ public class KBTLoadController {
 		}
 	}
 	
-	public void getEntities() {
+	/**
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Entity> getEntities() {
 		Command command = BlipServiceUtil.createCommandGet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
 
 		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
+		Envelope envelope = serializer.deserialize(response.getBody().toString());
 		
-		System.out.println(response.getBody());
-		
+		return (List<Entity>)(List<?>) BlipServiceUtil.getItemsDocumentFromEnvelope(envelope);		
 	}
 	
 	public void deleteEntity(String idEntity) {
