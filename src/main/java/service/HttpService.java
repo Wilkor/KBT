@@ -1,7 +1,6 @@
 package service;
 
 import java.util.Collections;
-import java.util.List;
 
 import org.limeprotocol.Envelope;
 import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
@@ -13,7 +12,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
-import model.Intention;
 import setting.KBTSettings;
 
 
@@ -37,17 +35,6 @@ public class HttpService {
 		HttpEntity<String> entity = new HttpEntity<String>(envelopeAsString, this.headers);
 
 		ResponseEntity<String> response = restTemplate.postForEntity(KBTSettings.BLIP_COMMAND_ENDPOINT, entity, String.class);
-
-		return response;
-	}
-	
-	
-	public ResponseEntity<Intention[]> post(Envelope envelope, Class classe) {
-
-		String envelopeAsString = new JacksonEnvelopeSerializer().serialize(envelope);
-		HttpEntity<String> entity = new HttpEntity<String>(envelopeAsString, this.headers);
-
-		ResponseEntity<Intention[]> response = restTemplate.postForEntity(KBTSettings.BLIP_COMMAND_ENDPOINT, entity,Intention[].class);
 
 		return response;
 	}

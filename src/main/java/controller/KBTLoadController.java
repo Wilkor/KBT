@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.limeprotocol.Command;
+import org.limeprotocol.DocumentBase;
 import org.limeprotocol.DocumentCollection;
 import org.limeprotocol.Envelope;
 import org.limeprotocol.LimeUri;
@@ -55,12 +56,14 @@ public class KBTLoadController {
 	@Inject
 	public KBTLoadController(HttpService httpService) {
 		this.httpService = httpService;
+		init();
 	}
 
 	@Inject
 	public KBTLoadController(HttpService httpService, EnvelopeSerializer serializer) {
 		this.httpService = httpService;
 		this.serializer = serializer;
+		init();
 	}
 	
 	/**
@@ -167,6 +170,7 @@ public class KBTLoadController {
 	/**
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public List<Intention> getIntentions() {
 		Command command = BlipServiceUtil.createCommandGet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
@@ -229,8 +233,10 @@ public class KBTLoadController {
 
 		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
 		Envelope envelope = serializer.deserialize(response.getBody().toString());
+		Command commandResp = (Command)envelope;
+		DocumentCollection doc = (DocumentCollection) commandResp.getResource();
 		
-		return (List<Entity>)(List<?>) BlipServiceUtil.getItemsDocumentFromEnvelope(envelope);		
+		return (List<Entity>)(List<?>) Arrays.asList(doc.getItems());		
 	}
 	
 	public void deleteEntity(String idEntity) {

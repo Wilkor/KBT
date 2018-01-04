@@ -87,8 +87,8 @@ public class Main {
 	//TODO REMOVER APÓS TESTES
 	protected static void getAll(KBTLoadController controller) {
 		
-		controller.getIntentions();
-//		controller.getEntities();		
+//		controller.getIntentions();
+		controller.getEntities();		
 	}
 	
 
