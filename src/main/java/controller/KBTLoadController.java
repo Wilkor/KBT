@@ -1,5 +1,9 @@
 package controller;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
@@ -28,8 +32,7 @@ import setting.KBTSettings;
 import util.BlipServiceUtil;
 
 /**
- * Classe respons�vel por controlar o Load dos dados da base de conhecimento no
- * Blip
+ * Classe responsavel por controlar o Load dos dados da base de conhecimento no Blip
  * 
  * @author Keila Lacerda
  *
@@ -50,41 +53,67 @@ public class KBTLoadController {
 	}
 
 	/**
-	 * Realiza o cadastramento de uma Inten��o no Blip
+	 * Percorre toda a lista de Intentions inserindo no Blip e atualizando o id
+	 * 
+	 * @param intentionsList
+	 */
+	public void loadIntentions(List<Intention> intentionsList) {
+		if (intentionsList != null && !intentionsList.isEmpty()) {
+			intentionsList.forEach( intention -> intention.setId(loadIntention(intention)) );			
+		}
+	}
+	
+	/**
+	 * Realiza o cadastramento de uma Intention no Blip.
 	 * 
 	 * @param intention
 	 */
-	public void loadIntention(Intention intention) {
+	public String loadIntention(Intention intention) {
 
 		Command command = BlipServiceUtil.createCommandSet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_INTENT_URI));
 		command.setResource(BlipServiceUtil.getJsonDocument(intention, MediaTypeEnum.INTENTION.getMediaTypeLime()));
 
 		this.httpService.post(command);
+		
+		return null;//TODO MUDAR PARA RETORNAR O ID
 	}
 
+	/**
+	 * Percorre toda a lista de Entities inserindo no Blip e atualizando o id.
+	 * 
+	 * @param entitiesList
+	 */
+	public void loadEntities(List<Entity> entitiesList) {
+		if (entitiesList != null && !entitiesList.isEmpty()) {
+			entitiesList.forEach(entity -> entity.setId(loadEntity(entity)));
+		}
+	}
+	
 	/**
 	 * Realiza o cadastramento de uma Entidade no Blip
 	 * 
 	 * @param entity
 	 */
-	public void loadEntity(Entity entity) {
+	public String loadEntity(Entity entity) {
 		Command command = BlipServiceUtil.createCommandSet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_ENTITY_URI));
 		command.setResource(BlipServiceUtil.getJsonDocument(entity, MediaTypeEnum.ENTITY.getMediaTypeLime()));
 
 		this.httpService.post(command);
+		
+		return null;// TODO MUDAR PARA RETORNAR O ID DA ENTITY CADASTRADA
 	}
 
 	/**
-	 * Realiza o cadastramento de um Recurso/Conte�do no Blip
+	 * Realiza o cadastramento de um Recurso/Conteudo no Blip
 	 * 
 	 * @param content
 	 */
 	public void loadContent(Content content) {
 		Command command = BlipServiceUtil.createCommandSet();
 		// TODO O que concatenar na URI????
-		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI));
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI + getResourceKey(content)));
 
 		PlainText text = new PlainText(content.getValue());
 		command.setResource(text);
@@ -92,7 +121,30 @@ public class KBTLoadController {
 		this.httpService.post(command);
 	}
 
-	@SuppressWarnings("unchecked")
+	/**
+	 * Retorna uma Key formatada da seguinte maneira:
+	 * {idIntention}-{idsEntidades}
+	 * @param content
+	 * @return
+	 */
+	private String getResourceKey(Content content) {
+		if(content != null) {
+			StringBuilder key = new StringBuilder();
+			if(content.getIntention() != null) {
+				key.append(content.getIntention().getId());
+			}
+			
+			ArrayList<String> idEntitiesList = new ArrayList<>();
+			content.getEntityValues().forEach( entityValue -> idEntitiesList.add(entityValue.getEntity().getId()));
+			
+			Collections.sort(idEntitiesList);
+			
+			idEntitiesList.forEach(id -> key.append("#").append(id));
+		}
+		
+		return null;
+	}
+
 	public void getIntentions() {
 		try {
 			Command command = BlipServiceUtil.createCommandGet();
@@ -137,6 +189,25 @@ public class KBTLoadController {
 		if(!StringUtils.isEmpty(idIntention)) {
 			Command command = BlipServiceUtil.createCommandDelete();
 			command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_INTENTION_URI + idIntention));
+			
+			this.httpService.post(command);
+		}
+	}
+	
+	public void getEntities() {
+		Command command = BlipServiceUtil.createCommandGet();
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
+
+		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
+		
+		System.out.println(response.getBody());
+		
+	}
+	
+	public void deleteEntity(String idEntity) {
+		if(!StringUtils.isEmpty(idEntity)) {
+			Command command = BlipServiceUtil.createCommandDelete();
+			command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_ENTITY_URI + idEntity));
 			
 			this.httpService.post(command);
 		}

@@ -11,8 +11,8 @@ public final class ExtratorConstants {
 	/*
 	 * Sheet Name
 	 */
-	public static final String SHEET_NAME_SINONIMOS = "Sinônimos";
-	public static final String SHEET_NAME_INTENTION = "Frases";
+	public static final String SHEET_NAME_ENTIDADES = "Entidades";
+	public static final String SHEET_NAME_INTENTION = "Intenções";
 	public static final String SHEET_NAME_CONTENT = "Conteúdo";
 	
 	/*

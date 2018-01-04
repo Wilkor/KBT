@@ -64,7 +64,7 @@ public class ExcelExtractor {
 	 */
 	public void extractEntityValues(KnowledgeBase kB) throws ImportExcelException {
 
-		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_SINONIMOS);
+		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_ENTIDADES);
 
 		if (sheet != null) {
 			int rows = sheet.getPhysicalNumberOfRows();
@@ -108,7 +108,7 @@ public class ExcelExtractor {
 	 * @throws ImportExcelException
 	 */
 	public void extractEntity(KnowledgeBase kb) throws ImportExcelException {
-		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_SINONIMOS);
+		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_ENTIDADES);
 		Map<String, Entity> mapEntities = new HashMap<String, Entity>();
 
 		if (sheet != null) {

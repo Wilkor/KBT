@@ -10,6 +10,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
  */
 public class Entity {
 
+	private String id;
+	
 	private String name;
 
 	private Set<EntityValue> values;
@@ -19,6 +21,16 @@ public class Entity {
 
 	public Entity() {
 	}
+	
+	public String getId() {
+		return id;
+	}
+
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 
 	public String getKey() {
 		return key;
