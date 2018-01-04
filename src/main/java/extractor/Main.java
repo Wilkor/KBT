@@ -28,12 +28,12 @@ public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-	private static Validator validator;
-
-	@Inject
-	public Main(Validator validator) {
-		this.validator = validator;
-	}
+//	private static Validator validator;
+//
+//	@Inject
+//	public Main(Validator validator) {
+//		Main.validator = validator;
+//	}
 
 	public static void main(String[] args) {
 		try {

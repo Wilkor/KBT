@@ -80,7 +80,7 @@ public class IntentionEntityValidator {
 				LOGGER.info("Broken itentions and entities " + b.getKey(), b.getKey(), b);
 			});
 			
-			return broken.size() > 0 || withoutExamples.size() > 0;
+			return !(broken.size() > 0 || withoutExamples.size() > 0);
 
 		} catch (Exception e) {
 			LOGGER.error("Error on validate intention entity", e.getMessage(), e);

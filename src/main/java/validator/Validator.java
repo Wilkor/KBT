@@ -1,5 +1,7 @@
 package validator;
 
+import javax.inject.Inject;
+
 import model.KnowledgeBase;
 
 public class Validator {
@@ -8,6 +10,7 @@ public class Validator {
 	
 	private IntentionEntityValidator intentionEntityValidator;
 	
+	@Inject
 	public Validator() {
 		this.entityValidator = new EntityValidator();
 		this.intentionEntityValidator = new IntentionEntityValidator();

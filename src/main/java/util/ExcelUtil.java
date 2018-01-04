@@ -31,14 +31,14 @@ public class ExcelUtil {
 	 * @param urlFile
 	 *            caminho completo onde o arquivo se encontra
 	 * @throws ImportExcelException
-	 *             Exceção específica de importação
+	 *             ExceÃ§Ã£o especÃ­fica de importaÃ§Ã£o
 	 */
 	public static Workbook getWorkbookByUrl(String urlFile) throws ImportExcelException {
 		try {
 			File arquivo = new File(urlFile);
 			return getFileByInputStream(new FileInputStream(arquivo));
 		} catch (FileNotFoundException exp) {
-			throw new ImportExcelException("Não foi possível encontrar o arquivo: " + urlFile);
+			throw new ImportExcelException("NÃ£o foi possÃ­vel encontrar o arquivo: " + urlFile);
 		} catch (ImportExcelException exp) {
 			throw new ImportExcelException("Falha ao abrir arquivo: " + urlFile);
 		}
@@ -50,14 +50,14 @@ public class ExcelUtil {
 	 * @param inputStream
 	 *            stream de entrada
 	 * @throws ImportExcelException
-	 *             exceção específica
+	 *             exceÃ§Ã£o especÃ­fica
 	 */
 	public static Workbook getFileByInputStream(InputStream inputStream) throws ImportExcelException {
 		try {
 			OPCPackage pkg = OPCPackage.open(inputStream);
 			return new XSSFWorkbook(pkg);
 		} catch (InvalidFormatException exp) {
-			throw new ImportExcelException("Formato do arquivo inválido.");
+			throw new ImportExcelException("Formato do arquivo invÃ¡lido.");
 		} catch (IOException exp) {
 			throw new ImportExcelException("Falha ao processar arquivo.");
 		}
@@ -70,7 +70,7 @@ public class ExcelUtil {
 	 *            nome da aba
 	 * @return aba recuperada
 	 * @throws ImportExcelException
-	 *             exceção específica
+	 *             exceÃ§Ã£o especÃ­fica
 	 */
 	public static Sheet getSheetByName(Workbook workbook, String sheetName) throws ImportExcelException {
 
@@ -79,7 +79,7 @@ public class ExcelUtil {
 			aba = workbook.getSheet(sheetName.trim());
 
 			if (aba == null) {
-				throw new ImportExcelException("Não foi encontrada a aba " + sheetName);
+				throw new ImportExcelException("NÃ£o foi encontrada a aba " + sheetName);
 			}
 		}
 
@@ -91,13 +91,13 @@ public class ExcelUtil {
 	}
 
 	/**
-	 * Obtém o valor da célula independente do tipo de célula.
+	 * ObtÃ©m o valor da cÃ©lula independente do tipo de cÃ©lula.
 	 * 
 	 * @param row
 	 *            linha atual
 	 * @param cellIndex
 	 *            coluna atual
-	 * @return valor da célula
+	 * @return valor da cÃ©lula
 	 */
 	public static Object getCellValueGeneric(Workbook workbook, Row row, int cellIndex) {
 		Cell cell = row.getCell(cellIndex);
@@ -153,8 +153,8 @@ public class ExcelUtil {
 	 * Formata double com 2 casas decimais, mantendo o separador com ponto(.)
 	 * 
 	 * @param number
-	 *            número a ser formatado
-	 * @return número formatado
+	 *            nÃºmero a ser formatado
+	 * @return nÃºmero formatado
 	 */
 	private static Double numberFormatter(Double number) {
 		DecimalFormat df = new DecimalFormat("#.##");

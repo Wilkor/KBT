@@ -36,7 +36,7 @@ public class EntityValidator {
 				LOGGER.info("Entities equals 0");
 			}
 			
-			return entityInCat.size() > 0;
+			return !(entityInCat.size() > 0);
 			
 		} catch (Exception e) {
 			LOGGER.error("Error on validate", e.getMessage(), e);

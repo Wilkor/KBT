@@ -97,8 +97,6 @@ public class ExcelExtractor {
 			}
 
 			kB.setMapEntityValues(mapEntityValues);
-			EntityValidator evalid = new EntityValidator();
-			evalid.validate(kB);
 		}
 
 	}
@@ -265,9 +263,6 @@ public class ExcelExtractor {
 		}
 
 		kb.setContentList(contentList);
-
-		IntentionEntityValidator val = new IntentionEntityValidator();
-		val.validate(kb);
 	}
 
 	/**
