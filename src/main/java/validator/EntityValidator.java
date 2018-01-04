@@ -27,30 +27,15 @@ public class EntityValidator {
 
 				for (Entity en : entities) {
 					for (EntityValues ev : Arrays.asList(en.getValues())) {
-//						for (String s : Arrays.asList(ev.getSynonymous())) {
 							if (ev.getName().equals(en.getName())) {
 								entityInCat.add(en);
 							}
-//						}
 					}
 				}
-				
-//				entities.forEach(en -> {
-//					Arrays.stream(en.getValues()).forEach( ev -> {
-//						if (Arrays.asList(ev).contains(en.getName())) {
-//							entityInCat.add(en);
-//						}
-//					});
-//				});
-				
-//				entityValues.stream().filter(f -> f.getEntity().getName().equals(f.getCategory()))
-//						.forEach(entityInCat::add);
 				
 				entityInCat.forEach(e -> {
 					LOGGER.info("Entity (" + e.getName() + ") in category", e.getName(), e);
 				});
-				
-				
 
 			} else {
 				LOGGER.info("Entities equals 0");

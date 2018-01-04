@@ -72,10 +72,11 @@ public class ExcelExtractor {
 				if (row != null) {
 
 					Entity ent = new Entity();
-					ent.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
+
+					ent.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY));
 
 					EntityValues ev = ent.new EntityValues();
-					ev.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CATEGORY_VALUE));
+					ev.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
 
 					ev.setSynonymous(
 							ExcelUtil.getValuesTextBetweenColumns(workbook, row, ExtratorConstants.SINONIMOS_CELL_BEGIN,

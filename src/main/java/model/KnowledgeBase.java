@@ -21,12 +21,9 @@ public class KnowledgeBase {
 
 	private List<Content> contentList;
 
-	private List<EntityValue> entityValues;
-
 	private List<Entity> entities;
 
 	public KnowledgeBase() {
-		this.entityValues = new ArrayList<>();
 
 		this.contentList = new ArrayList<>();
 
@@ -37,10 +34,6 @@ public class KnowledgeBase {
 		this.mapIntentions = new HashMap<String, Intention>();
 
 		this.entities = new ArrayList<>();
-	}
-
-	public void add(EntityValue entityValue) {
-		this.entityValues.add(entityValue);
 	}
 
 	public void add(Content content) {
@@ -57,14 +50,6 @@ public class KnowledgeBase {
 
 	public void setEntities(List<Entity> entities) {
 		this.entities = entities;
-	}
-
-	public List<EntityValue> getEntityValues() {
-		return entityValues;
-	}
-
-	public void setEntityValues(List<EntityValue> entityValues) {
-		this.entityValues = entityValues;
 	}
 
 	public Map<String, EntityValue> getMapEntityValues() {
