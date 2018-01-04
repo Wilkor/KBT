@@ -16,24 +16,26 @@ public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-//	private static Validator validator;
-//
-//	@Inject
-//	public Main(Validator validator) {
-//		Main.validator = validator;
-//	}
+	private static Validator validator;
+
+	@Inject
+	public Main(Validator validator) {
+		Main.validator = validator;
+	}
 
 	public static void main(String[] args) {
 		try {
 			ExcelExtractor excelExtractor = new ExcelExtractor();
 			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
 			
-			 Validator validator = new Validator();
-			
 			if (!validator.validate(kb)) {
 				LOGGER.info("Can not complete KB import", kb, kb);
 			}
-//			getIntentions();
+//			getAll();
+			
+//			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\ZUP\\Santander\\ChatBots\\kb.xlsx");
+//			Gson gson = new Gson();
+//			gson.toJson(kb, new FileWriter("C:\\ZUP\\Santander\\ChatBots\\fileKBT.json"));
 			
 		} catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -86,24 +88,25 @@ public class Main {
 
 	}
 
-	protected static void getIntentions() {
+	protected static void getAll() {
 		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
 
 		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
 		KBTLoadController controller = new KBTLoadController(httpService);
 
-		controller.getIntentions();
-		
+//		controller.getIntentions();
+		controller.getEntities();		
 	}
 	
 
-	protected static void deleteIntention() {
+	protected static void deleteOne() {
 		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
 
 		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
 		KBTLoadController controller = new KBTLoadController(httpService);
 
-		controller.deleteIntention("order_pizza2");
+//		controller.deleteIntention("order_pizza2");
+		controller.deleteEntity("entity_1");
 		
 	}
 }
