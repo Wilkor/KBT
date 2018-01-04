@@ -16,17 +16,20 @@ public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-	private static Validator validator;
-
-	@Inject
-	public Main(Validator validator) {
-		Main.validator = validator;
-	}
+//	private static Validator validator;
+//
+//	@Inject
+//	public Main(Validator validator) {
+//		Main.validator = validator;
+//	}
 
 	public static void main(String[] args) {
 		try {
+			
 			ExcelExtractor excelExtractor = new ExcelExtractor();
 			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
+			
+			Validator validator = new Validator();
 			
 			if (!validator.validate(kb)) {
 				LOGGER.info("Can not complete KB import", kb, kb);
