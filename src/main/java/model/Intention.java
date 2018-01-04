@@ -7,6 +7,8 @@ import java.util.Objects;
 import org.limeprotocol.DocumentBase;
 import org.limeprotocol.MediaType;
 
+import net.take.iris.messaging.resources.artificialIntelligence.Entity;
+
 /**
  * @author Keila Lacerda
  *

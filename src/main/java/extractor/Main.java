@@ -1,20 +1,11 @@
 package extractor;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import javax.inject.Inject;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
 import controller.KBTLoadController;
 import model.Content;
-import model.Entity;
-import model.EntityValue;
 import model.Intention;
 import model.KnowledgeBase;
 import service.HttpService;
@@ -67,18 +58,18 @@ public class Main {
 		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
 		KBTLoadController controller = new KBTLoadController(httpService);
 
-		Entity entity = new Entity("Entity 9", "key 9");
-		Set<EntityValue> values = new HashSet<>();
-		EntityValue e = new EntityValue();
-		e.setCategory("test cat");
-		List<String> synonyms = new ArrayList<>();
-		synonyms.add("sin 11");
-		synonyms.add("sin 12");
-		e.setSynonyms(synonyms);
-		e.setName("Val 1");
-		values.add(e);
-		entity.setValues(values);
-		controller.loadEntity(entity);
+//		Entity entity = new Entity("Entity 9", "key 9");
+//		Set<EntityValue> values = new HashSet<>();
+//		EntityValue e = new EntityValue();
+//		e.setCategory("test cat");
+//		List<String> synonyms = new ArrayList<>();
+//		synonyms.add("sin 11");
+//		synonyms.add("sin 12");
+//		e.setSynonyms(synonyms);
+//		e.setName("Val 1");
+//		values.add(e);
+//		entity.setValues(values);
+//		controller.loadEntity(entity);
 
 	}
 

@@ -5,6 +5,8 @@ import java.util.List;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import net.take.iris.messaging.resources.artificialIntelligence.Entity;
+
 /**
  * @author Keila Lacerda
  *
@@ -22,6 +24,8 @@ public class EntityValue implements Comparable<EntityValue> {
 	@JsonIgnore
 	private String category;
 
+	private Entity entity;
+
 	public String getCategory() {
 		return category;
 	}
@@ -29,8 +33,6 @@ public class EntityValue implements Comparable<EntityValue> {
 	public void setCategory(String category) {
 		this.category = category;
 	}
-
-	private Entity entity;
 
 	public Entity getEntity() {
 		return entity;

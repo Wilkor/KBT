@@ -2,10 +2,8 @@ package extractor;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -17,14 +15,13 @@ import org.slf4j.LoggerFactory;
 import constant.ExtratorConstants;
 import exception.ImportExcelException;
 import model.Content;
-import model.Entity;
 import model.EntityValue;
 import model.Intention;
 import model.KnowledgeBase;
+import net.take.iris.messaging.resources.artificialIntelligence.Entity;
+import net.take.iris.messaging.resources.artificialIntelligence.Entity.EntityValues;
 import util.ExcelUtil;
 import util.StringUtil;
-import validator.EntityValidator;
-import validator.IntentionEntityValidator;
 
 /**
  * @author Keila Lacerda
@@ -46,9 +43,9 @@ public class ExcelExtractor {
 			KnowledgeBase kb = new KnowledgeBase();
 
 			extractEntityValues(kb);
-			extractEntity(kb);
-			extractIntention(kb);
-			extractContent(kb);
+//			extractEntity(kb);
+//			extractIntention(kb);
+//			extractContent(kb);
 
 			return kb;
 
@@ -68,35 +65,30 @@ public class ExcelExtractor {
 
 		if (sheet != null) {
 			int rows = sheet.getPhysicalNumberOfRows();
-			Map<String, EntityValue> mapEntityValues = new HashMap<String, EntityValue>();
 
-			// percorre todas as linhas da aba
 			for (int i = 1; i <= rows; i++) {
 				Row row = sheet.getRow(i);
 
 				if (row != null) {
-					EntityValue entityValue = new EntityValue();
 
-					entityValue
-							.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
+					Entity ent = new Entity();
+					ent.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
 
-					entityValue.setSynonyms(ExcelUtil.getValuesTextBetweenColumns(workbook, row,
-							ExtratorConstants.SINONIMOS_CELL_BEGIN, ExtratorConstants.SINONIMOS_CELL_END));
+					EntityValues ev = ent.new EntityValues();
+					ev.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CATEGORY_VALUE));
 
-					entityValue.setEntity(new Entity(entityValue.getName()));
+					ev.setSynonymous(
+							ExcelUtil.getValuesTextBetweenColumns(workbook, row, ExtratorConstants.SINONIMOS_CELL_BEGIN,
+									ExtratorConstants.SINONIMOS_CELL_END).stream().toArray(String[]::new));
 
-					entityValue.setCategory(
-							ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CATEGORY_VALUE));
+					EntityValues[] evs = { ev };
+					ent.setValues(evs);
 
-					mapEntityValues.put(entityValue.getName(), entityValue);
+					 kB.add(ent);
 
-					kB.add(entityValue);
-
-					mapEntityValues.put(StringUtils.lowerCase(entityValue.getName()), entityValue);
 				}
 			}
 
-			kB.setMapEntityValues(mapEntityValues);
 		}
 
 	}
@@ -125,12 +117,12 @@ public class ExcelExtractor {
 					if (!mapEntities.containsKey(entityName)) {
 						entity = new Entity();
 						entity.setName(entityName);
-						entity.setValues(new HashSet<EntityValue>());
+						// entity.setValues(new HashSet<EntityValue>());
 						mapEntities.put(StringUtils.lowerCase(entityName), entity);
 					}
 
-					mapEntities.get(StringUtils.lowerCase(entityName)).getValues()
-							.add(kb.getMapEntityValues().get(StringUtils.lowerCase(entityValueName)));
+					// mapEntities.get(StringUtils.lowerCase(entityName)).getValues()
+					// .add(kb.getMapEntityValues().get(StringUtils.lowerCase(entityValueName)));
 				}
 			}
 		}
@@ -253,8 +245,9 @@ public class ExcelExtractor {
 						content.getIntention()
 								.setKey(StringUtil.removeSpecialCharacters(content.getIntention().getName()));
 					} else {
-						content.getIntention()
-								.setKey(makeKey(content.getIntention().getEntities(), content.getIntention()));
+						// content.getIntention()
+						// .setKey(makeKey(content.getIntention().getEntities(),
+						// content.getIntention()));
 					}
 
 					contentList.add(content);
@@ -290,7 +283,8 @@ public class ExcelExtractor {
 				String entity = StringUtils.lowerCase(ExcelUtil.getCellText(workbook, row, i)).trim();
 
 				if (entity != null && !entity.equals("")) {
-					ret.add(new Entity(entity, StringUtil.removeSpecialCharacters(entity.replace(" ", ""))));
+					// ret.add(new Entity(entity,
+					// StringUtil.removeSpecialCharacters(entity.replace(" ", ""))));
 				}
 
 			}
@@ -298,9 +292,9 @@ public class ExcelExtractor {
 		return ret;
 	}
 
-	private static String makeKey(List<Entity> entities, Intention i) {
-		return i.getName().toLowerCase() + "_"
-				+ entities.stream().map(n -> n.getKey()).collect(Collectors.joining("_"));
-	}
+	// private static String makeKey(List<Entity> entities, Intention i) {
+	// return i.getName().toLowerCase() + "_"
+	// + entities.stream().map(n -> n.getKey()).collect(Collectors.joining("_"));
+	// }
 
 }

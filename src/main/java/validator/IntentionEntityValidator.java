@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import model.Entity;
 import model.Intention;
 import model.KnowledgeBase;
+import net.take.iris.messaging.resources.artificialIntelligence.Entity;
 import util.StringUtil;
 
 public class IntentionEntityValidator {
@@ -53,7 +53,7 @@ public class IntentionEntityValidator {
 					List<Entity> entities = intention.getEntities();
 					List<Intention> is;
 					for (Entity entity : entities) {
-						is = searchIntentions(ints, StringUtil.removeSpecialCharacters(intention.getName() + "_" + entity.getKey()));
+						is = searchIntentions(ints, StringUtil.removeSpecialCharacters(intention.getName() + "_" + entity.getName()));
 
 						if (is.size() == 0) {
 							if (broken.stream().noneMatch(p)) {

@@ -4,11 +4,8 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.limeprotocol.Command;
-import org.limeprotocol.Document;
-import org.limeprotocol.Envelope;
 import org.limeprotocol.LimeUri;
 import org.limeprotocol.messaging.contents.PlainText;
-import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -21,8 +18,8 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 
 import enums.MediaTypeEnum;
 import model.Content;
-import model.Entity;
 import model.Intention;
+import net.take.iris.messaging.resources.artificialIntelligence.Entity;
 import service.HttpService;
 import setting.KBTSettings;
 import util.BlipServiceUtil;
