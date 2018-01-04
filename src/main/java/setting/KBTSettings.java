@@ -1,7 +1,7 @@
 package setting;
 
 /**
- * Classe respons·vel por armazenar todos os dados de configuraÁ„o da aplicaÁ„o.
+ * Classe respons√°vel por armazenar todos os dados de configura√ß√£o da aplica√ß√£o.
  * 
  * @author Keila Lacerda
  *

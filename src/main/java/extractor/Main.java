@@ -1,6 +1,5 @@
 package extractor;
 
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -20,29 +19,30 @@ import model.Intention;
 import model.KnowledgeBase;
 import service.HttpService;
 import setting.KBTSettings;
-import validator.IntentionEntityValidator;
 import validator.Validator;
 
 public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-	private static Validator validator;
-
-	@Inject
-	public Main(Validator validator) {
-		this.validator = validator;
-	}
+//	private static Validator validator;
+//
+//	@Inject
+//	public Main(Validator validator) {
+//		Main.validator = validator;
+//	}
 
 	public static void main(String[] args) {
 		try {
-//			ExcelExtractor excelExtractor = new ExcelExtractor();
-//			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
-//			
-//			if (!validator.validate(kb)) {
-//				LOGGER.info("Can not complete KB import", kb, kb);
-//			}
-			getIntentions();
+			ExcelExtractor excelExtractor = new ExcelExtractor();
+			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
+			
+			 Validator validator = new Validator();
+			
+			if (!validator.validate(kb)) {
+				LOGGER.info("Can not complete KB import", kb, kb);
+			}
+//			getIntentions();
 			
 		} catch (Exception e) {
             LOGGER.error(e.getMessage());

@@ -3,7 +3,7 @@ package enums;
 import org.limeprotocol.MediaType;
 
 /**
- * Enum os possíveis 'MediaType' para o que vai ser cadastrado na base de conhecimento
+ * Enum os possÃ­veis 'MediaType' para o que vai ser cadastrado na base de conhecimento
  * 
  * @author Keila Lacerda
  *

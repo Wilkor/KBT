@@ -1,7 +1,7 @@
 package constant;
 
 /**
- * Classe de constantes específicas para a parte do Extrator de Dados
+ * Classe de constantes especÃ­ficas para a parte do Extrator de Dados
  * 
  * @author Keila Lacerda
  *
@@ -11,9 +11,9 @@ public final class ExtratorConstants {
 	/*
 	 * Sheet Name
 	 */
-	public static final String SHEET_NAME_SINONIMOS = "Sinônimos";
+	public static final String SHEET_NAME_SINONIMOS = "SinÃ´nimos";
 	public static final String SHEET_NAME_INTENTION = "Frases";
-	public static final String SHEET_NAME_CONTENT = "Conteúdo";
+	public static final String SHEET_NAME_CONTENT = "ConteÃºdo";
 	
 	/*
 	 * Cell Index
@@ -38,5 +38,5 @@ public final class ExtratorConstants {
 	/*
 	 * OTHERS
 	 */
-	public static final String NAO = "Não";
+	public static final String NAO = "NÃ£o";
 }
