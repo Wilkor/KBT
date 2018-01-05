@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -73,10 +74,10 @@ public class ExcelExtractor {
 
 					Entity ent = new Entity();
 
-					ent.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY));
+					ent.setName(StringUtil.removeSpecialCharacters(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY)));
 
 					EntityValues ev = ent.new EntityValues();
-					ev.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
+					ev.setName(StringUtil.removeSpecialCharacters(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE)));
 
 					ev.setSynonymous(
 							ExcelUtil.getValuesTextBetweenColumns(workbook, row, ExtratorConstants.SINONIMOS_CELL_BEGIN,
@@ -110,9 +111,9 @@ public class ExcelExtractor {
 				Row row = sheet.getRow(i);
 
 				if (row != null) {
-					String entityName = ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY);
-					String entityValueName = ExcelUtil.getCellText(workbook, row,
-							ExtratorConstants.CELL_INDEX_ENTITY_VALUE);
+					String entityName = StringUtil.removeSpecialCharacters(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY));
+//					String entityValueName = ExcelUtil.getCellText(workbook, row,
+//							ExtratorConstants.CELL_INDEX_ENTITY_VALUE);
 					Entity entity = null;
 
 					if (!mapEntities.containsKey(entityName)) {
@@ -147,9 +148,9 @@ public class ExcelExtractor {
 				Row row = sheet.getRow(i);
 
 				if (row != null) {
-					String intentionName = ExcelUtil
+					String intentionName = StringUtil.removeSpecialCharacters(ExcelUtil
 							.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_INTENTION_NAME).trim()
-							.toLowerCase();
+							.toLowerCase());
 					Intention intention = null;
 
 					// Se a intencao ainda nao estiver no map cria e adiciona
@@ -183,9 +184,9 @@ public class ExcelExtractor {
 
 				if (row != null) {
 
-					String currentIntention = ExcelUtil
+					String currentIntention = StringUtil.removeSpecialCharacters(ExcelUtil
 							.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_INTENTION_NAME).trim()
-							.toLowerCase();
+							.toLowerCase());
 
 					if (intention.getName().trim().toLowerCase().equals(currentIntention)) {
 						examples.add(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
@@ -227,8 +228,8 @@ public class ExcelExtractor {
 					if (StringUtils.isEmpty(intermediateResponse)
 							|| intermediateResponse.equalsIgnoreCase(ExtratorConstants.NAO)) {
 
-						content.setValue(
-								ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA));
+						content.setValue(StringEscapeUtils.escapeHtml(
+								ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA)));
 
 						content.setIntermediate(false);
 					} else {
