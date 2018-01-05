@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
@@ -73,10 +74,10 @@ public class ExcelExtractor {
 
 					Entity ent = new Entity();
 
-					ent.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY));
+					ent.setName(StringUtil.removeSpecialCharacters(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY)));
 
 					EntityValues ev = ent.new EntityValues();
-					ev.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE));
+					ev.setName(StringUtil.removeSpecialCharacters(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE)));
 
 					ev.setSynonymous(
 							ExcelUtil.getValuesTextBetweenColumns(workbook, row, ExtratorConstants.SINONIMOS_CELL_BEGIN,
@@ -156,9 +157,9 @@ public class ExcelExtractor {
 
 				if (row != null) {
 
-					String currentIntention = ExcelUtil
+					String currentIntention = StringUtil.removeSpecialCharacters(ExcelUtil
 							.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_INTENTION_NAME).trim()
-							.toLowerCase();
+							.toLowerCase());
 
 					if (intention.getName().trim().toLowerCase().equals(currentIntention)) {
 

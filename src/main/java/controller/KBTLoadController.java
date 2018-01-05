@@ -9,27 +9,22 @@ import javax.inject.Inject;
 
 import org.apache.commons.lang3.StringUtils;
 import org.limeprotocol.Command;
-import org.limeprotocol.DocumentBase;
+import org.limeprotocol.Command.CommandStatus;
 import org.limeprotocol.DocumentCollection;
 import org.limeprotocol.Envelope;
 import org.limeprotocol.LimeUri;
 import org.limeprotocol.messaging.Registrator;
 import org.limeprotocol.messaging.contents.PlainText;
 import org.limeprotocol.serialization.EnvelopeSerializer;
-import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-
+import constant.LoaderConstants;
 import enums.MediaTypeEnum;
+import exception.LoaderException;
 import model.Content;
 import model.Intention;
+import model.KnowledgeBase;
 import net.take.iris.messaging.resources.artificialIntelligence.Entity;
 import service.HttpService;
 import setting.KBTSettings;
@@ -75,6 +70,41 @@ public class KBTLoadController {
 	}
 	
 	/**
+	 * @param kb
+	 * @throws LoaderException 
+	 */
+	public void loadBase(KnowledgeBase kb) throws LoaderException {
+		if(kb != null) {
+			/*
+			 * Processo Load Intention
+			 */
+			deleteIntentions(getIntentions());
+			loadIntentions(new ArrayList<Intention>(kb.getMapIntentions().values()));
+			
+			/*
+			 * Processo Load Entity
+			 */
+			deleteEntities(getEntities());
+			loadEntities(kb.getEntities());
+			
+			/*
+			 * Processo Load Conteudo/Resource
+			 */
+			
+		}
+	}
+	
+	/**
+	 * @param intentionsToDelete
+	 */
+	private void deleteIntentions(List<Intention> intentionsToDelete) {
+		
+		if(intentionsToDelete != null && !intentionsToDelete.isEmpty()) {
+			intentionsToDelete.forEach(intention -> deleteIntention(intention.getId()));
+		}
+	}
+	
+	/**
 	 * Percorre toda a lista de Intentions inserindo no Blip e atualizando o id
 	 * 
 	 * @param intentionsList
@@ -102,6 +132,17 @@ public class KBTLoadController {
 	}
 
 	/**
+	 * Remove Entidade
+	 * 
+	 * @param entities
+	 */
+	private void deleteEntities(List<Entity> entities) {
+		if (entities != null && !entities.isEmpty()) {
+			entities.forEach( entity -> deleteEntity(entity.getId()));			
+		}
+	}
+	
+	/**
 	 * Percorre toda a lista de Entities inserindo no Blip e atualizando o id.
 	 * 
 	 * @param entitiesList
@@ -121,10 +162,12 @@ public class KBTLoadController {
 		Command command = BlipServiceUtil.createCommandSet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_ENTITY_URI));
 		command.setResource(BlipServiceUtil.getJsonDocument(entity, MediaTypeEnum.ENTITY.getMediaTypeLime()));
-
-		this.httpService.post(command);
 		
-		return null;// TODO MUDAR PARA RETORNAR O ID DA ENTITY CADASTRADA
+		ResponseEntity<String> response = this.httpService.post(command);
+		Command commandResp = (Command)serializer.deserialize(response.getBody().toString());
+		Entity entityResp = (Entity) commandResp.getResource();
+		
+		return entityResp.getId();
 	}
 
 	/**
@@ -136,10 +179,11 @@ public class KBTLoadController {
 		Command command = BlipServiceUtil.createCommandSet();
 		// TODO O que concatenar na URI????
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI + getResourceKey(content)));
-
+				
 		PlainText text = new PlainText(content.getValue());
 		command.setResource(text);
-
+		command.setTo(null);
+		
 		this.httpService.post(command);
 	}
 
@@ -151,7 +195,7 @@ public class KBTLoadController {
 	 */
 	private String getResourceKey(Content content) {
 		if(content != null) {
-			StringBuilder key = new StringBuilder();
+			StringBuilder key = new StringBuilder("/");
 			if(content.getIntention() != null) {
 				key.append(content.getIntention().getId());
 			}
@@ -161,7 +205,9 @@ public class KBTLoadController {
 			
 			Collections.sort(idEntitiesList);
 			
-			idEntitiesList.forEach(id -> key.append("#").append(id));
+			idEntitiesList.forEach(id -> key.append("::").append(id));
+			
+			return key.toString();
 		}
 		
 		return null;
@@ -169,16 +215,28 @@ public class KBTLoadController {
 
 	/**
 	 * @return
+	 * @throws LoaderException 
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Intention> getIntentions() {
+	public List<Intention> getIntentions() throws LoaderException {
 		Command command = BlipServiceUtil.createCommandGet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
 
 		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
 		Envelope envelope = serializer.deserialize(response.getBody().toString());
+		Command commandResp = (Command)envelope;
 		
-		return (List<Intention>)(List<?>) BlipServiceUtil.getItemsDocumentFromEnvelope(envelope);	
+		if(CommandStatus.SUCCESS.equals(commandResp.getStatus())) {
+			DocumentCollection doc = (DocumentCollection) commandResp.getResource();
+			
+			return (List<Intention>)(List<?>) Arrays.asList(doc.getItems());
+		}
+		else if(commandResp.getReason().getCode() == LoaderConstants.RESOURCE_NOT_FOUND){
+			return null;
+		}
+		else {
+			throw new LoaderException(commandResp.getReason().getDescription());
+		}
 		
 		//TODO REMOVER
 //		try {
@@ -225,20 +283,33 @@ public class KBTLoadController {
 	
 	/**
 	 * @return
+	 * @throws LoaderException 
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Entity> getEntities() {
+	public List<Entity> getEntities() throws LoaderException {
 		Command command = BlipServiceUtil.createCommandGet();
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
 
 		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
 		Envelope envelope = serializer.deserialize(response.getBody().toString());
 		Command commandResp = (Command)envelope;
-		DocumentCollection doc = (DocumentCollection) commandResp.getResource();
 		
-		return (List<Entity>)(List<?>) Arrays.asList(doc.getItems());		
+		if(CommandStatus.SUCCESS.equals(commandResp.getStatus())) {
+			DocumentCollection doc = (DocumentCollection) commandResp.getResource();
+			
+			return (List<Entity>)(List<?>) Arrays.asList(doc.getItems());
+		}
+		else if(commandResp.getReason().getCode() == LoaderConstants.RESOURCE_NOT_FOUND){
+			return null;
+		}
+		else {
+			throw new LoaderException(commandResp.getReason().getDescription());
+		}
 	}
 	
+	/**
+	 * @param idEntity
+	 */
 	public void deleteEntity(String idEntity) {
 		if(!StringUtils.isEmpty(idEntity)) {
 			Command command = BlipServiceUtil.createCommandDelete();
