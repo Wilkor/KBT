@@ -23,6 +23,8 @@ public class KnowledgeBase {
 
 	private List<Entity> entities;
 
+	private List<Intention> intentions;
+
 	public KnowledgeBase() {
 
 		this.contentList = new ArrayList<>();
@@ -34,10 +36,24 @@ public class KnowledgeBase {
 		this.mapIntentions = new HashMap<String, Intention>();
 
 		this.entities = new ArrayList<>();
+
+		this.intentions = new ArrayList<>();
+	}
+
+	public List<Intention> getIntentions() {
+		return intentions;
+	}
+
+	public void setIntentions(List<Intention> intentions) {
+		this.intentions = intentions;
 	}
 
 	public void add(Content content) {
 		this.contentList.add(content);
+	}
+
+	public void add(Intention intention) {
+		this.intentions.add(intention);
 	}
 
 	public void add(Entity entity) {

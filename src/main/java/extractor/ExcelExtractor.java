@@ -1,9 +1,9 @@
 package extractor;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
@@ -20,6 +20,7 @@ import model.Intention;
 import model.KnowledgeBase;
 import net.take.iris.messaging.resources.artificialIntelligence.Entity;
 import net.take.iris.messaging.resources.artificialIntelligence.Entity.EntityValues;
+import net.take.iris.messaging.resources.artificialIntelligence.Question;
 import util.ExcelUtil;
 import util.StringUtil;
 
@@ -42,10 +43,9 @@ public class ExcelExtractor {
 
 			KnowledgeBase kb = new KnowledgeBase();
 
-			extractEntityValues(kb);
-//			extractEntity(kb);
-//			extractIntention(kb);
-//			extractContent(kb);
+			extractEntity(kb);
+			// extractIntention(kb);
+			extractContent(kb);
 
 			return kb;
 
@@ -59,7 +59,7 @@ public class ExcelExtractor {
 	 * @param kB
 	 * @throws ImportExcelException
 	 */
-	public void extractEntityValues(KnowledgeBase kB) throws ImportExcelException {
+	public void extractEntity(KnowledgeBase kB) throws ImportExcelException {
 
 		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_ENTIDADES);
 
@@ -85,7 +85,7 @@ public class ExcelExtractor {
 					EntityValues[] evs = { ev };
 					ent.setValues(evs);
 
-					 kB.add(ent);
+					kB.add(ent);
 
 				}
 			}
@@ -98,85 +98,58 @@ public class ExcelExtractor {
 	 * @param kb
 	 * @throws ImportExcelException
 	 */
-	public void extractEntity(KnowledgeBase kb) throws ImportExcelException {
-		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_ENTIDADES);
-		Map<String, Entity> mapEntities = new HashMap<String, Entity>();
+	public void extractContent(KnowledgeBase kb) throws ImportExcelException {
+
+		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_CONTENT);
 
 		if (sheet != null) {
 			int rows = sheet.getPhysicalNumberOfRows();
 
-			// percorre todas as linhas da aba
 			for (int i = 1; i <= rows; i++) {
 				Row row = sheet.getRow(i);
 
 				if (row != null) {
-					String entityName = ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY);
-					String entityValueName = ExcelUtil.getCellText(workbook, row,
-							ExtratorConstants.CELL_INDEX_ENTITY_VALUE);
-					Entity entity = null;
 
-					if (!mapEntities.containsKey(entityName)) {
-						entity = new Entity();
-						entity.setName(entityName);
-						// entity.setValues(new HashSet<EntityValue>());
-						mapEntities.put(StringUtils.lowerCase(entityName), entity);
-					}
+					Intention in = new Intention();
 
-					// mapEntities.get(StringUtils.lowerCase(entityName)).getValues()
-					// .add(kb.getMapEntityValues().get(StringUtils.lowerCase(entityValueName)));
+					in.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_INTENTION));
+
+					in.setEntities(getEntityContent(row, in));
+
+					in.setQuestions(extractExamples(in).stream().toArray(Question[]::new));
+
+					in.setKey(makeKey(in, in.getEntities()));
+
+					// String intermediateResponse = ExcelUtil.getCellText(workbook, row,
+					// ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA_INTERMEDIARIA);
+					//
+					// if (StringUtils.isEmpty(intermediateResponse)
+					// || intermediateResponse.equalsIgnoreCase(ExtratorConstants.NAO)) {
+					//
+					// content.setValue(
+					// ExcelUtil.getCellText(workbook, row,
+					// ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA));
+					//
+					// content.setIntermediate(false);
+					// } else {
+					// content.setValue(intermediateResponse);
+					// content.setIntermediate(true);
+					// }
+
+					kb.add(in);
 				}
 			}
 		}
-
-		kb.setMapEntities(mapEntities);
 	}
 
-	/**
-	 * @param kb
-	 * @throws ImportExcelException
-	 */
-	public void extractIntention(KnowledgeBase kb) throws ImportExcelException {
-		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_INTENTION);
-		Map<String, Intention> mapIntentions = new HashMap<String, Intention>();
-
-		if (sheet != null) {
-			int rows = sheet.getPhysicalNumberOfRows();
-
-			// percorre todas as linhas da aba
-			for (int i = 1; i <= rows; i++) {
-				Row row = sheet.getRow(i);
-
-				if (row != null) {
-					String intentionName = ExcelUtil
-							.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_INTENTION_NAME).trim()
-							.toLowerCase();
-					Intention intention = null;
-
-					// Se a intencao ainda nao estiver no map cria e adiciona
-					if (!mapIntentions.containsKey(intentionName)) {
-						intention = new Intention();
-						intention.setName(intentionName);
-						intention.setExamples(new ArrayList<String>());
-						mapIntentions.put(StringUtils.lowerCase(intentionName), intention);
-					}
-
-					mapIntentions.get(StringUtils.lowerCase(intentionName)).getExamples()
-							.add(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
-				}
-			}
-		}
-
-		kb.setMapIntentions(mapIntentions);
-	}
-
-	public List<String> extractExamples(Intention intention) throws ImportExcelException {
+	private List<Question> extractExamples(Intention intention) throws ImportExcelException {
 
 		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_INTENTION);
 
-		List<String> examples = null;
+		List<Question> questions = null;
 
 		if (sheet != null) {
-			examples = new ArrayList<>();
+			questions = new ArrayList<>();
 
 			for (int i = 1; i <= sheet.getPhysicalNumberOfRows(); i++) {
 				Row row = sheet.getRow(i);
@@ -188,75 +161,17 @@ public class ExcelExtractor {
 							.toLowerCase();
 
 					if (intention.getName().trim().toLowerCase().equals(currentIntention)) {
-						examples.add(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
+
+						Question q = new Question();
+						q.setText(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
+
+						questions.add(q);
 					}
 				}
 			}
 		}
 
-		return examples;
-	}
-
-	/**
-	 * @param kb
-	 * @throws ImportExcelException
-	 */
-	public void extractContent(KnowledgeBase kb) throws ImportExcelException {
-
-		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_CONTENT);
-
-		List<Content> contentList = new ArrayList<>();
-
-		if (sheet != null) {
-			int rows = sheet.getPhysicalNumberOfRows();
-
-			// percorre todas as linhas da aba
-			for (int i = 1; i <= rows; i++) {
-				Row row = sheet.getRow(i);
-
-				if (row != null) {
-					Content content = new Content();
-
-					content.setIntention(new Intention(
-							ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_INTENTION)));
-
-					// TODO VALIDAR questao pergunta intermediaria
-					String intermediateResponse = ExcelUtil.getCellText(workbook, row,
-							ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA_INTERMEDIARIA);
-
-					if (StringUtils.isEmpty(intermediateResponse)
-							|| intermediateResponse.equalsIgnoreCase(ExtratorConstants.NAO)) {
-
-						content.setValue(
-								ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA));
-
-						content.setIntermediate(false);
-					} else {
-						content.setValue(intermediateResponse);
-						content.setIntermediate(true);
-					}
-
-					content.setEntityValues(getEntityValuesContent(row, kb.getMapEntityValues()));
-
-					content.getIntention().setEntities(getEntityContent(row, content.getIntention()));
-
-					content.getIntention().setExamples(extractExamples(content.getIntention()));
-
-					if (content.getIntention().getEntities().size() == 0) {
-						content.getIntention()
-								.setKey(StringUtil.removeSpecialCharacters(content.getIntention().getName()));
-					} else {
-						// content.getIntention()
-						// .setKey(makeKey(content.getIntention().getEntities(),
-						// content.getIntention()));
-					}
-
-					contentList.add(content);
-				}
-			}
-		}
-
-		kb.setContentList(contentList);
+		return questions;
 	}
 
 	/**
@@ -284,8 +199,10 @@ public class ExcelExtractor {
 				String entity = StringUtils.lowerCase(ExcelUtil.getCellText(workbook, row, i)).trim();
 
 				if (entity != null && !entity.equals("")) {
-					// ret.add(new Entity(entity,
-					// StringUtil.removeSpecialCharacters(entity.replace(" ", ""))));
+					Entity e = new Entity();
+					e.setName(entity);
+					
+					ret.add(e);
 				}
 
 			}
@@ -293,9 +210,19 @@ public class ExcelExtractor {
 		return ret;
 	}
 
-	// private static String makeKey(List<Entity> entities, Intention i) {
-	// return i.getName().toLowerCase() + "_"
-	// + entities.stream().map(n -> n.getKey()).collect(Collectors.joining("_"));
-	// }
+	private static String makeKey(Intention in, List<Entity> entities) {
+
+		String key;
+
+		if (in.getEntities().size() == 0) {
+			key = StringUtil.removeSpecialCharacters(in.getName());
+		} else {
+			key = in.getName().toLowerCase() + "_" + entities.stream()
+					.map(n -> StringUtil.removeSpecialCharacters(n.getName())).collect(Collectors.joining("_"));
+			;
+		}
+
+		return key;
+	}
 
 }
