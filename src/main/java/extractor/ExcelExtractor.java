@@ -2,7 +2,6 @@ package extractor;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang.StringEscapeUtils;
@@ -10,13 +9,13 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.limeprotocol.PlainDocument;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import constant.ExtratorConstants;
+import enums.MediaTypeEnum;
 import exception.ImportExcelException;
-import model.Content;
-import model.EntityValue;
 import model.Intention;
 import model.KnowledgeBase;
 import net.take.iris.messaging.resources.artificialIntelligence.Entity;
@@ -110,7 +109,7 @@ public class ExcelExtractor {
 				Row row = sheet.getRow(i);
 
 				if (row != null) {
-
+					
 					Intention in = new Intention();
 
 					in.setName(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_INTENTION));
@@ -120,22 +119,9 @@ public class ExcelExtractor {
 					in.setQuestions(extractExamples(in).stream().toArray(Question[]::new));
 
 					in.setKey(makeKey(in, in.getEntities()));
-
-					// String intermediateResponse = ExcelUtil.getCellText(workbook, row,
-					// ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA_INTERMEDIARIA);
-					//
-					// if (StringUtils.isEmpty(intermediateResponse)
-					// || intermediateResponse.equalsIgnoreCase(ExtratorConstants.NAO)) {
-					//
-					// content.setValue(
-					// ExcelUtil.getCellText(workbook, row,
-					// ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA));
-					//
-					// content.setIntermediate(false);
-					// } else {
-					// content.setValue(intermediateResponse);
-					// content.setIntermediate(true);
-					// }
+					
+					PlainDocument resource = new PlainDocument(ExcelUtil.getEscapedCellText(workbook, row,ExtratorConstants.CELL_INDEX_CONTENT_RESPOSTA),MediaTypeEnum.RESOURCE.getMediaTypeLime());
+					in.setResource(resource );
 
 					kb.add(in);
 				}
@@ -143,6 +129,11 @@ public class ExcelExtractor {
 		}
 	}
 
+	/**
+	 * @param intention
+	 * @return
+	 * @throws ImportExcelException
+	 */
 	private List<Question> extractExamples(Intention intention) throws ImportExcelException {
 
 		Sheet sheet = ExcelUtil.getSheetByName(workbook, ExtratorConstants.SHEET_NAME_INTENTION);
@@ -164,7 +155,7 @@ public class ExcelExtractor {
 					if (intention.getName().trim().toLowerCase().equals(currentIntention)) {
 
 						Question q = new Question();
-						q.setText(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE));
+						q.setText(StringEscapeUtils.escapeHtml(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_EXAMPLE)));
 
 						questions.add(q);
 					}
@@ -177,20 +168,9 @@ public class ExcelExtractor {
 
 	/**
 	 * @param row
-	 * @param mapEntityValues
+	 * @param intention
 	 * @return
 	 */
-	private List<EntityValue> getEntityValuesContent(Row row, Map<String, EntityValue> mapEntityValues) {
-		List<EntityValue> listReturn = new ArrayList<EntityValue>();
-
-		if (workbook != null && row != null) {
-			for (int i = ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_BEGIN; i <= ExtratorConstants.ENTITIES_VALUE_CONTENT_CELL_END; i++) {
-				listReturn.add(mapEntityValues.get(StringUtils.lowerCase(ExcelUtil.getCellText(workbook, row, i))));
-			}
-		}
-		return listReturn;
-	}
-
 	private List<Entity> getEntityContent(Row row, Intention intention) {
 		List<Entity> ret = new ArrayList<Entity>();
 
@@ -211,15 +191,20 @@ public class ExcelExtractor {
 		return ret;
 	}
 
+	/**
+	 * @param in
+	 * @param entities
+	 * @return
+	 */
 	private static String makeKey(Intention in, List<Entity> entities) {
 
 		String key;
 
 		if (in.getEntities().size() == 0) {
-			key = StringUtil.removeSpecialCharacters(in.getName());
+			key = StringUtil.removeSpecialCharacters(in.getName()).replace(" ", "_");
 		} else {
-			key = in.getName().toLowerCase() + "_" + entities.stream()
-					.map(n -> StringUtil.removeSpecialCharacters(n.getName())).collect(Collectors.joining("_"));
+			key = in.getName().toLowerCase().replace(" ", "_") + ExtratorConstants.SEPARATION_CHAR + entities.stream()
+					.map(n -> StringUtil.removeSpecialCharacters(n.getName().replace(" ", "_"))).collect(Collectors.joining(ExtratorConstants.SEPARATION_CHAR));
 			;
 		}
 

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import constant.ExtratorConstants;
 import model.Intention;
 import model.KnowledgeBase;
 import net.take.iris.messaging.resources.artificialIntelligence.Entity;
@@ -62,7 +63,7 @@ public class IntentionEntityValidator {
 
 					for (Entity entity : entities) {
 
-						String key = StringUtil.removeSpecialCharacters(intention.getName()) + "_"
+						String key = StringUtil.removeSpecialCharacters(intention.getName()) + ExtratorConstants.SEPARATION_CHAR
 								+ StringUtil.removeSpecialCharacters(entity.getName());
 
 						is = searchIntentions(ints, StringUtil.removeSpecialCharacters(key));

@@ -2,6 +2,7 @@ package service;
 
 import java.util.Collections;
 
+import org.limeprotocol.Command;
 import org.limeprotocol.Envelope;
 import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +36,16 @@ public class HttpService {
 		HttpEntity<String> entity = new HttpEntity<String>(envelopeAsString, this.headers);
 
 		ResponseEntity<String> response = restTemplate.postForEntity(KBTSettings.BLIP_COMMAND_ENDPOINT, entity, String.class);
+
+		return response;
+	}
+	
+	public ResponseEntity<Command> post2(Envelope envelope) {
+
+		String envelopeAsString = new JacksonEnvelopeSerializer().serialize(envelope);
+		HttpEntity<String> entity = new HttpEntity<String>(envelopeAsString, this.headers);
+
+		ResponseEntity<Command> response = restTemplate.postForEntity(KBTSettings.BLIP_COMMAND_ENDPOINT, entity, Command.class);
 
 		return response;
 	}

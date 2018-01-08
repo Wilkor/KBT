@@ -1,8 +1,6 @@
 package controller;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -10,11 +8,11 @@ import javax.inject.Inject;
 import org.apache.commons.lang3.StringUtils;
 import org.limeprotocol.Command;
 import org.limeprotocol.Command.CommandStatus;
+import org.limeprotocol.Document;
 import org.limeprotocol.DocumentCollection;
-import org.limeprotocol.Envelope;
 import org.limeprotocol.LimeUri;
+import org.limeprotocol.PlainDocument;
 import org.limeprotocol.messaging.Registrator;
-import org.limeprotocol.messaging.contents.PlainText;
 import org.limeprotocol.serialization.EnvelopeSerializer;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -22,10 +20,10 @@ import org.springframework.stereotype.Component;
 import constant.LoaderConstants;
 import enums.MediaTypeEnum;
 import exception.LoaderException;
-import model.Content;
-import model.Intention;
 import model.KnowledgeBase;
 import net.take.iris.messaging.resources.artificialIntelligence.Entity;
+import net.take.iris.messaging.resources.artificialIntelligence.Intention;
+import net.take.iris.messaging.resources.artificialIntelligence.Question;
 import service.HttpService;
 import setting.KBTSettings;
 import util.BlipServiceUtil;
@@ -75,11 +73,12 @@ public class KBTLoadController {
 	 */
 	public void loadBase(KnowledgeBase kb) throws LoaderException {
 		if(kb != null) {
+			
 			/*
 			 * Processo Load Intention
 			 */
 			deleteIntentions(getIntentions());
-			loadIntentions(new ArrayList<Intention>(kb.getMapIntentions().values()));
+			loadIntentions(kb.getIntentions());
 			
 			/*
 			 * Processo Load Entity
@@ -90,17 +89,37 @@ public class KBTLoadController {
 			/*
 			 * Processo Load Conteudo/Resource
 			 */
-			
+			deleteResources(getResources());
+			loadResources(kb.getIntentions());
 		}
 	}
 	
+	/**
+	 * @param resources
+	 */
+	private void deleteResources(List<PlainDocument> resources) {
+		
+		if(resources != null && !resources.isEmpty()) {
+			resources.forEach(resource -> deleteResource(resource));
+		}
+	}
+
+	private void deleteResource(PlainDocument resource) {
+		if(resource != null) {
+			Command command = BlipServiceUtil.createCommandDelete();
+			command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_RESOURCE_URI + resource.getValue()));
+			
+			this.httpService.post(command);
+		}
+	}
+
 	/**
 	 * @param intentionsToDelete
 	 */
 	private void deleteIntentions(List<Intention> intentionsToDelete) {
 		
 		if(intentionsToDelete != null && !intentionsToDelete.isEmpty()) {
-			intentionsToDelete.forEach(intention -> deleteIntention(intention.getId()));
+			intentionsToDelete.forEach(intention -> deleteIntention(intention));
 		}
 	}
 	
@@ -109,7 +128,7 @@ public class KBTLoadController {
 	 * 
 	 * @param intentionsList
 	 */
-	public void loadIntentions(List<Intention> intentionsList) {
+	public void loadIntentions(List<model.Intention> intentionsList) {
 		if (intentionsList != null && !intentionsList.isEmpty()) {
 			intentionsList.forEach( intention -> intention.setId(loadIntention(intention)) );			
 		}
@@ -126,9 +145,33 @@ public class KBTLoadController {
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_INTENT_URI));
 		command.setResource(BlipServiceUtil.getJsonDocument(intention, MediaTypeEnum.INTENTION.getMediaTypeLime()));
 
-		this.httpService.post(command);
+		ResponseEntity<String> response = this.httpService.post(command);
+		Command commandResp = (Command)serializer.deserialize(response.getBody().toString());
+		net.take.iris.messaging.resources.artificialIntelligence.Intention intentionResp = (net.take.iris.messaging.resources.artificialIntelligence.Intention) commandResp.getResource();
 		
-		return null;//TODO MUDAR PARA RETORNAR O ID
+		intention.setId(intentionResp.getId());
+		
+		loadQuestions(intention);
+		
+		return intentionResp.getId();
+	}
+
+	/**
+	 * @param intention
+	 */
+	private void loadQuestions(Intention intention) {
+		Command command = BlipServiceUtil.createCommandSet();
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_QUESTIONS_URI.replace("{idIntention}", intention.getId())));
+		
+		DocumentCollection doc = new DocumentCollection();
+		doc.setItemType(MediaTypeEnum.QUESTIONS.getMediaTypeLime());
+		doc.setItems(new Document[intention.getQuestions().length]);
+		for (int i = 0; i< intention.getQuestions().length; i++) {
+			doc.getItems()[i] = BlipServiceUtil.getJsonDocument(intention.getQuestions()[i], MediaTypeEnum.QUESTIONS.getMediaTypeLime());
+		}
+		
+		command.setResource(doc);
+		this.httpService.post(command);
 	}
 
 	/**
@@ -175,43 +218,53 @@ public class KBTLoadController {
 	 * 
 	 * @param content
 	 */
-	public void loadContent(Content content) {
+	public void loadResources(List<model.Intention> intentions) {
+		
+		if(intentions != null && !intentions.isEmpty()) {
+			intentions.forEach(intention -> loadResource(intention));
+		}
+	}
+
+	/**
+	 * @param resource
+	 */
+	private void loadResource(model.Intention intention) {
 		Command command = BlipServiceUtil.createCommandSet();
-		// TODO O que concatenar na URI????
-		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI + getResourceKey(content)));
+		
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_SET_RESOURCE_URI + LoaderConstants.PREFIX_AI + intention.getKey()));
 				
-		PlainText text = new PlainText(content.getValue());
-		command.setResource(text);
+//		PlainText text = new PlainText(content.getValue());
+		command.setResource(intention.getResource());
 		command.setTo(null);
 		
 		this.httpService.post(command);
 	}
 
-	/**
-	 * Retorna uma Key formatada da seguinte maneira:
-	 * {idIntention}-{idsEntidades}
-	 * @param content
-	 * @return
-	 */
-	private String getResourceKey(Content content) {
-		if(content != null) {
-			StringBuilder key = new StringBuilder("/");
-			if(content.getIntention() != null) {
-				key.append(content.getIntention().getId());
-			}
-			
-			ArrayList<String> idEntitiesList = new ArrayList<>();
-			content.getEntityValues().forEach( entityValue -> idEntitiesList.add(entityValue.getEntity().getId()));
-			
-			Collections.sort(idEntitiesList);
-			
-			idEntitiesList.forEach(id -> key.append("::").append(id));
-			
-			return key.toString();
-		}
-		
-		return null;
-	}
+//	/**
+//	 * Retorna uma Key formatada da seguinte maneira:
+//	 * {idIntention}-{idsEntidades}
+//	 * @param content
+//	 * @return
+//	 */
+//	private String getResourceKey(Content content) {
+//		if(content != null) {
+//			StringBuilder key = new StringBuilder("/");
+//			if(content.getIntention() != null) {
+//				key.append(content.getIntention().getId());
+//			}
+//			
+//			ArrayList<String> idEntitiesList = new ArrayList<>();
+//			content.getEntityValues().forEach( entityValue -> idEntitiesList.add(entityValue.getEntity().getId()));
+//			
+//			Collections.sort(idEntitiesList);
+//			
+//			idEntitiesList.forEach(id -> key.append("::").append(id));
+//			
+//			return key.toString();
+//		}
+//		
+//		return null;
+//	}
 
 	/**
 	 * @return
@@ -220,16 +273,15 @@ public class KBTLoadController {
 	@SuppressWarnings("unchecked")
 	public List<Intention> getIntentions() throws LoaderException {
 		Command command = BlipServiceUtil.createCommandGet();
-		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_URI));
 
 		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
-		Envelope envelope = serializer.deserialize(response.getBody().toString());
-		Command commandResp = (Command)envelope;
+		Command commandResp = (Command)serializer.deserialize(response.getBody().toString());
 		
 		if(CommandStatus.SUCCESS.equals(commandResp.getStatus())) {
 			DocumentCollection doc = (DocumentCollection) commandResp.getResource();
 			
-			return (List<Intention>)(List<?>) Arrays.asList(doc.getItems());
+			return getQuestions((List<Intention>)(List<?>) Arrays.asList(doc.getItems()));
 		}
 		else if(commandResp.getReason().getCode() == LoaderConstants.RESOURCE_NOT_FOUND){
 			return null;
@@ -237,50 +289,80 @@ public class KBTLoadController {
 		else {
 			throw new LoaderException(commandResp.getReason().getDescription());
 		}
-		
-		//TODO REMOVER
-//		try {
-//			Command command = BlipServiceUtil.createCommandGet();
-//			command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_INTENTIONS_URI));
-//
-//			ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
-//
-//			if (response.getStatusCode() == HttpStatus.OK) {
-//
-//				System.out.println(response);
-//
-//				ObjectMapper objectMapper = new ObjectMapper();
-//				objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
-//
-//				objectMapper.disable(MapperFeature.DEFAULT_VIEW_INCLUSION);
-//				objectMapper.disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES);
-//
-//				objectMapper.configure(SerializationFeature.WRITE_DATES_AS_TIMESTAMPS, true);
-//				objectMapper.enable(DeserializationFeature.ACCEPT_EMPTY_STRING_AS_NULL_OBJECT);
-//				
-//				model.Command cmd = objectMapper.readValue(response.getBody().toString(), model.Command.class);
-//
-//				System.out.println(cmd.getId());
-//				
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
-			
 	}
 	
 	/**
+	 * @param intentions
+	 * @return
+	 */
+	private List<Intention> getQuestions(List<Intention> intentions){
+		if(intentions != null && !intentions.isEmpty()) {
+			intentions.forEach(intention -> {
+				try {
+					intention.setQuestions(getQuestionsByIntention(intention));
+				} catch (LoaderException e) {
+					new RuntimeException(e.getMessage());
+				}
+			});
+		}
+		return intentions;
+	}
+
+	/**
+	 * @param intention
+	 * @return
+	 * @throws LoaderException
+	 */
+	private Question[] getQuestionsByIntention(Intention intention) throws LoaderException {
+		Command command = BlipServiceUtil.createCommandGet();
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_QUESTIONS_URI.replace(LoaderConstants.ID_INTENTION, intention.getId())));
+
+		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
+		Command commandResp = (Command)serializer.deserialize(response.getBody().toString());
+		
+		if(CommandStatus.SUCCESS.equals(commandResp.getStatus())) {
+			DocumentCollection doc = (DocumentCollection) commandResp.getResource();
+			
+			return Arrays.copyOf(doc.getItems(), doc.getItems().length, Question[].class);
+		}
+		else if(commandResp.getReason().getCode() == LoaderConstants.RESOURCE_NOT_FOUND){
+			return null;
+		}
+		else {
+			throw new LoaderException("Fail to get 'Questions' - " + commandResp.getReason().getDescription());
+		}
+	}
+
+	/**
 	 * @param idIntention
 	 */
-	public void deleteIntention(String idIntention) {
-		if(!StringUtils.isEmpty(idIntention)) {
+	public void deleteIntention(Intention intention) {
+		if(intention != null) {
 			Command command = BlipServiceUtil.createCommandDelete();
-			command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_INTENTION_URI + idIntention));
+			command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_INTENTION_URI + intention.getId()));
+			
+			//remover todas as questões da intention
+			deleteQuestions(intention);
 			
 			this.httpService.post(command);
 		}
 	}
 	
+	/**
+	 * @param intention
+	 */
+	private void deleteQuestions(Intention intention) {
+		if(intention != null && intention.getQuestions() != null && intention.getQuestions().length > 0) {
+			for (Question question : intention.getQuestions()) {
+				Command command = BlipServiceUtil.createCommandDelete();
+				command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_QUESTIONS_URI.replace(LoaderConstants.ID_INTENTION, intention.getId()) + question.getId()));
+								
+				this.httpService.post(command);
+			}
+		}
+		
+	}
+
 	/**
 	 * @return
 	 * @throws LoaderException 
@@ -291,8 +373,7 @@ public class KBTLoadController {
 		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_ENTITIES_URI));
 
 		ResponseEntity<String> response = (ResponseEntity<String>) this.httpService.post(command);
-		Envelope envelope = serializer.deserialize(response.getBody().toString());
-		Command commandResp = (Command)envelope;
+		Command commandResp = (Command)serializer.deserialize(response.getBody().toString());
 		
 		if(CommandStatus.SUCCESS.equals(commandResp.getStatus())) {
 			DocumentCollection doc = (DocumentCollection) commandResp.getResource();
@@ -307,6 +388,32 @@ public class KBTLoadController {
 		}
 	}
 	
+	/**
+	 * @return
+	 * @throws LoaderException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<PlainDocument> getResources() throws LoaderException {
+	
+		Command command = BlipServiceUtil.createCommandGet();
+		command.setUri(LimeUri.parse(KBTSettings.BLIP_GET_RESOURCE_URI));
+		command.setTo(null);
+
+		ResponseEntity<String> response = this.httpService.post(command);
+		Command commandRet = (Command)serializer.deserialize(response.getBody().toString());
+		
+		if(CommandStatus.SUCCESS.equals(commandRet.getStatus())) {
+			DocumentCollection doc = (DocumentCollection) commandRet.getResource();
+			
+			return (List<PlainDocument>)(List<?>) Arrays.asList(doc.getItems());
+		}
+		else if(commandRet.getReason().getCode() == LoaderConstants.RESOURCE_NOT_FOUND){
+			return null;
+		}
+		else {
+			throw new LoaderException(commandRet.getReason().getDescription());
+		}
+	}
 	/**
 	 * @param idEntity
 	 */

@@ -10,6 +10,7 @@ import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.poi.openxml4j.exceptions.InvalidFormatException;
 import org.apache.poi.openxml4j.opc.OPCPackage;
@@ -90,6 +91,10 @@ public class ExcelUtil {
 		return getCellValueGeneric(workbook, row, cellIndex).toString();
 	}
 
+	public static String getEscapedCellText(Workbook workbook, Row row, int cellIndex) {
+		return StringEscapeUtils.escapeHtml(getCellValueGeneric(workbook, row, cellIndex).toString());
+	}
+	
 	/**
 	 * Obtém o valor da célula independente do tipo de célula.
 	 * 
