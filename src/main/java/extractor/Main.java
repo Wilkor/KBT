@@ -30,6 +30,15 @@ public class Main {
 	 * @param args
 	 */
 	public static void main(String[] args) {
+		String botKey = "";
+		if(args != null && args.length > 0) {
+			botKey = args[0];
+		}
+		else {
+			LOGGER.info("Não foi informado a Key correspondente ao Bot.");
+			return;
+		}
+		
 		Path filePath = initProcessKBT();
 		
 		try {
@@ -46,7 +55,7 @@ public class Main {
 			}
 			else {
 				//Insere os dados no Blip
-				KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
+				KBTSettings kbtSettings = new KBTSettings(botKey);
 				HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
 				KBTLoadController controller = new KBTLoadController(httpService, new JacksonEnvelopeSerializer());
 				
