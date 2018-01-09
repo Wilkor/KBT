@@ -46,6 +46,21 @@ public class ExcelUtil {
 	}
 
 	/**
+	 * @param file
+	 * @return
+	 * @throws ImportExcelException
+	 */
+	public static Workbook getWorkbookByFile(File file) throws ImportExcelException {
+		try {
+			return getFileByInputStream(new FileInputStream(file));
+		} catch (FileNotFoundException exp) {
+			throw new ImportExcelException("Não foi possível encontrar o arquivo: " + file.getAbsolutePath());
+		} catch (ImportExcelException exp) {
+			throw new ImportExcelException("Falha ao abrir arquivo: " + file.getAbsolutePath());
+		}
+	}
+	
+	/**
 	 * Abre arquivo a ser importado.
 	 * 
 	 * @param inputStream

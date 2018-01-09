@@ -66,7 +66,7 @@ public class IntentionEntityValidator {
 						String key = StringUtil.removeSpecialCharacters(intention.getName()) + ExtratorConstants.SEPARATION_CHAR
 								+ StringUtil.removeSpecialCharacters(entity.getName());
 
-						is = searchIntentions(ints, StringUtil.removeSpecialCharacters(key));
+						is = searchIntentions(ints, key);
 
 						if (is.size() == 0) {
 							if (broken.stream().noneMatch(p)) {

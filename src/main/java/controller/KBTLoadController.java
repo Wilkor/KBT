@@ -14,6 +14,7 @@ import org.limeprotocol.LimeUri;
 import org.limeprotocol.PlainDocument;
 import org.limeprotocol.messaging.Registrator;
 import org.limeprotocol.serialization.EnvelopeSerializer;
+import org.slf4j.Logger;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
@@ -69,28 +70,38 @@ public class KBTLoadController {
 	
 	/**
 	 * @param kb
+	 * @param logger 
 	 * @throws LoaderException 
 	 */
-	public void loadBase(KnowledgeBase kb) throws LoaderException {
+	public void loadBase(KnowledgeBase kb, Logger logger) throws LoaderException {
 		if(kb != null) {
 			
 			/*
 			 * Processo Load Intention
 			 */
+			logger.info("Deletando Intenções...");
 			deleteIntentions(getIntentions());
+			logger.info("Inserindo Intenções...");
 			loadIntentions(kb.getIntentions());
+			logger.info("Intenções inseridas com sucesso.");
 			
 			/*
 			 * Processo Load Entity
 			 */
+			logger.info("Deletando Entidades...");
 			deleteEntities(getEntities());
+			logger.info("Inserindo Entidades...");
 			loadEntities(kb.getEntities());
+			logger.info("Entidades inseridas com sucesso.");
 			
 			/*
 			 * Processo Load Conteudo/Resource
 			 */
+			logger.info("Deletando Conteúdo...");
 			deleteResources(getResources());
+			logger.info("Inserindo Conteúdo...");
 			loadResources(kb.getIntentions());
+			logger.info("Conteúdo inserido com sucesso.");
 		}
 	}
 	
@@ -107,6 +118,7 @@ public class KBTLoadController {
 	private void deleteResource(PlainDocument resource) {
 		if(resource != null) {
 			Command command = BlipServiceUtil.createCommandDelete();
+			command.setTo(null);
 			command.setUri(LimeUri.parse(KBTSettings.BLIP_DELETE_RESOURCE_URI + resource.getValue()));
 			
 			this.httpService.post(command);

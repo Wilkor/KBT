@@ -1,5 +1,6 @@
 package extractor;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -55,6 +56,26 @@ public class ExcelExtractor {
 		return null;
 	}
 
+	/**
+	 * @param path
+	 */
+	public KnowledgeBase extractExcelData(File file) {
+		try {
+			workbook = ExcelUtil.getWorkbookByFile(file);
+
+			KnowledgeBase kb = new KnowledgeBase();
+
+			extractEntity(kb);
+			// extractIntention(kb);
+			extractContent(kb);
+
+			return kb;
+
+		} catch (ImportExcelException e) {
+			LOGGER.error(e.getMessage());
+		}
+		return null;
+	}
 	/**
 	 * @param kB
 	 * @throws ImportExcelException

@@ -9,6 +9,12 @@ package constant;
 public final class ExtratorConstants {
 
 	/*
+	 * 
+	 */
+	public static final String FILE_PATH = "C:/KB/KB.xlsx";
+	
+	
+	/*
 	 * Sheet Name
 	 */
 	public static final String SHEET_NAME_ENTIDADES = "Entidades";
