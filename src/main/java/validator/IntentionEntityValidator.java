@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +101,7 @@ public class IntentionEntityValidator {
 			});
 
 			notFindKey.stream().distinct().forEach(e -> {
-				LOGGER.info("Itentions and entities not found " + e);
+				LOGGER.info("Itentions and entities not found " + StringEscapeUtils.unescapeHtml(e));
 			});
 
 			// broken.forEach(b -> {
