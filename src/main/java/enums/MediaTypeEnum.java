@@ -12,7 +12,8 @@ public enum MediaTypeEnum {
 
 	INTENTION("application/vnd.iris.ai.intention+json"),
 	ENTITY("application/vnd.iris.ai.entity+json"),
-	RESOURCE("text/plain");
+	RESOURCE("text/plain"),
+	QUESTIONS("application/vnd.iris.ai.question+json");
 	
 	private String type;
 	

@@ -1,21 +1,22 @@
 package extractor;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.io.IOException;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
-import javax.inject.Inject;
-
+import org.limeprotocol.serialization.JacksonEnvelopeSerializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.client.RestTemplate;
 
+import constant.ExtratorConstants;
 import controller.KBTLoadController;
-import model.Content;
-import model.Entity;
-import model.EntityValue;
-import model.Intention;
+import enums.StatusFileEnum;
 import model.KnowledgeBase;
 import service.HttpService;
 import setting.KBTSettings;
@@ -25,97 +26,103 @@ public class Main {
 
 	private static final Logger LOGGER = LoggerFactory.getLogger(Main.class);
 
-	private static Validator validator;
-
-	@Inject
-	public Main(Validator validator) {
-		Main.validator = validator;
-	}
-
+	/**
+	 * @param args
+	 */
 	public static void main(String[] args) {
+		String botKey = "";
+		if(args != null && args.length > 0) {
+			botKey = args[0];
+		}
+		else {
+			LOGGER.info("Não foi informado a Key correspondente ao Bot.");
+			return;
+		}
+		
+		Path filePath = initProcessKBT();
+		
 		try {
+			//Extrai os dados da planilha
 			ExcelExtractor excelExtractor = new ExcelExtractor();
-			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\kb.xlsx");
+			KnowledgeBase kb = excelExtractor.extractExcelData(filePath.toFile());
+			
+			//Valida aplicando regras de negócio
+			Validator validator = new Validator();
 			
 			if (!validator.validate(kb)) {
-				LOGGER.info("Can not complete KB import", kb, kb);
+				LOGGER.info("Não foi possível completar a atualização da base.", kb, kb);
+				moveFileToRejected(filePath);
 			}
-//			getAll();
-			
-//			KnowledgeBase kb = excelExtractor.extractExcelData("C:\\ZUP\\Santander\\ChatBots\\kb.xlsx");
-//			Gson gson = new Gson();
-//			gson.toJson(kb, new FileWriter("C:\\ZUP\\Santander\\ChatBots\\fileKBT.json"));
+			else {
+				//Insere os dados no Blip
+				KBTSettings kbtSettings = new KBTSettings(botKey);
+				HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
+				KBTLoadController controller = new KBTLoadController(httpService, new JacksonEnvelopeSerializer());
+				
+				controller.loadBase(kb,LOGGER);
+				
+				moveFileToProcessed(filePath);
+				LOGGER.info("Processo de atualização de base concluído!");
+			}
 			
 		} catch (Exception e) {
+			moveFileToRejected(filePath);
             LOGGER.error(e.getMessage());
         }
-			// controller.loadIntention(intention);
 
    }
-
-	protected static void loadIntention() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-		Intention intention = new Intention();
-		intention.setName("Teste I4");
-		controller.loadIntention(intention);
-	}
-
-	protected static void loadEntity() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-
-		Entity entity = new Entity("Entity 9", "key 9");
-		Set<EntityValue> values = new HashSet<>();
-		EntityValue e = new EntityValue();
-		e.setCategory("test cat");
-		List<String> synonyms = new ArrayList<>();
-		synonyms.add("sin 11");
-		synonyms.add("sin 12");
-		e.setSynonyms(synonyms);
-		e.setName("Val 1");
-		values.add(e);
-		entity.setValues(values);
-		controller.loadEntity(entity);
-
-	}
-
-	protected static void loadContent() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-
-		Content content = new Content();
-		content.setValue("Teste Resource");
-
-		controller.loadContent(content);
-
-	}
-
-	protected static void getAll() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-
-//		controller.getIntentions();
-		controller.getEntities();		
+	
+	/**
+	 * Move arquivo para a pasta Processando e loga início do processo
+	 */
+	private static Path initProcessKBT() {
+		DateFormat df = new SimpleDateFormat("yyyyMMdd_hhmm");
+		String fileRename = StatusFileEnum.PROCESSING.getPathFile() + "kb_" + df.format(new Date()) + ".xlsx";
+		
+		Path movefrom = FileSystems.getDefault().getPath(ExtratorConstants.FILE_PATH);
+		Path targetProcessing = FileSystems.getDefault().getPath(fileRename);
+		
+        try {
+            Files.move(movefrom, targetProcessing, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("Início do processo de atualização da base de conhecimento");
+            LOGGER.info("Arquivo movido para a pasta 'Processando.");
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+        
+        return targetProcessing;
 	}
 	
-
-	protected static void deleteOne() {
-		KBTSettings kbtSettings = new KBTSettings("Ym90d2g6MVRocWhBa2xvWTdxMHo2d2dCOTQ=");
-
-		HttpService httpService = new HttpService(new RestTemplate(), kbtSettings);
-		KBTLoadController controller = new KBTLoadController(httpService);
-
-//		controller.deleteIntention("order_pizza2");
-		controller.deleteEntity("entity_1");
+	/**
+	 * @param pathFile
+	 */
+	private static void moveFileToRejected(Path pathFile) {
+		String fileRename = StatusFileEnum.REJECTED.getPathFile() + pathFile.getFileName().toString();
+		Path pathToMove = FileSystems.getDefault().getPath(fileRename );
 		
+        try {
+            Files.move(pathFile, pathToMove, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("Falha ao processar arquivo. Arquivo movido para a pasta 'Rejeitados'");
+        } catch (IOException e) {
+            System.err.println(e);
+        }
 	}
+	
+	
+	/**
+	 * @param pathFile
+	 */
+	private static void moveFileToProcessed(Path pathFile) {
+		String fileRename = StatusFileEnum.PROCESSED.getPathFile() + pathFile.getFileName().toString();
+		Path pathToMove = FileSystems.getDefault().getPath(fileRename );
+		
+        try {
+            Files.move(pathFile, pathToMove, StandardCopyOption.REPLACE_EXISTING);
+            LOGGER.info("Processo de importação de dados concluído.");
+            LOGGER.info("Arquivo movido para a pasta 'Processados'.");
+        } catch (IOException e) {
+            System.err.println(e);
+        }
+	}
+
 }

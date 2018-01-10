@@ -23,7 +23,7 @@
 	<logger name="org.hibernate.validator.internal.util.Version"
 		level="WARN" />
 
-	<property name="LOG_FILE" value="c:/kbt-%d{yyyy-MM-dd_HH-mm}.log" />
+	<property name="LOG_FILE" value="c:/KB/kbt-%d{yyyy-MM-dd_HH-mm}.log"  />
 
 	<appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
 		<encoder>

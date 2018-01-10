@@ -1,9 +1,9 @@
 package model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
+
+import net.take.iris.messaging.resources.artificialIntelligence.Entity;
 
 /**
  * @author Keila Lacerda
@@ -11,74 +11,38 @@ import java.util.Map;
  */
 public class KnowledgeBase {
 
-	private Map<String, EntityValue> mapEntityValues;
+	private List<Entity> entities;
 
-	private Map<String, Intention> mapIntentions;
-
-	private Map<String, Entity> mapEntities;
-
-	private List<Content> contentList;
-
-	private List<EntityValue> entityValues;
+	private List<Intention> intentions;
 
 	public KnowledgeBase() {
-		this.entityValues = new ArrayList<>();
-		
-		this.contentList = new ArrayList<>();
-		
-		this.mapEntities = new HashMap<String, Entity>();
-		
-		this.mapEntityValues = new HashMap<String, EntityValue>();
-		
-		this.mapIntentions = new HashMap<String, Intention>();
+
+		this.entities = new ArrayList<>();
+
+		this.intentions = new ArrayList<>();
 	}
 
-	public List<EntityValue> getEntityValues() {
-		return entityValues;
+	public List<Intention> getIntentions() {
+		return intentions;
 	}
 
-	public void setEntityValues(List<EntityValue> entityValues) {
-		this.entityValues = entityValues;
+	public void setIntentions(List<Intention> intentions) {
+		this.intentions = intentions;
 	}
 
-	public Map<String, EntityValue> getMapEntityValues() {
-		return mapEntityValues;
+	public void add(Intention intention) {
+		this.intentions.add(intention);
 	}
 
-	public void setMapEntityValues(Map<String, EntityValue> mapEntityValues) {
-		this.mapEntityValues = mapEntityValues;
+	public void add(Entity entity) {
+		this.entities.add(entity);
 	}
 
-	public Map<String, Intention> getMapIntentions() {
-		return mapIntentions;
+	public List<Entity> getEntities() {
+		return entities;
 	}
 
-	public void setMapIntentions(Map<String, Intention> mapIntentions) {
-		this.mapIntentions = mapIntentions;
+	public void setEntities(List<Entity> entities) {
+		this.entities = entities;
 	}
-
-	public Map<String, Entity> getMapEntities() {
-		return mapEntities;
-	}
-
-	public void setMapEntities(Map<String, Entity> mapEntities) {
-		this.mapEntities = mapEntities;
-	}
-
-	public List<Content> getContentList() {
-		return contentList;
-	}
-
-	public void setContentList(List<Content> contentList) {
-		this.contentList = contentList;
-	}
-
-	public void add(EntityValue entityValue) {
-		this.entityValues.add(entityValue);
-	}
-
-	public void add(Content content) {
-		this.contentList.add(content);
-	}
-
 }

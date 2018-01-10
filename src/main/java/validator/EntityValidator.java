@@ -1,13 +1,15 @@
 package validator;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import model.EntityValue;
 import model.KnowledgeBase;
+import net.take.iris.messaging.resources.artificialIntelligence.Entity;
+import net.take.iris.messaging.resources.artificialIntelligence.Entity.EntityValues;
 
 public class EntityValidator {
 
@@ -17,20 +19,23 @@ public class EntityValidator {
 
 		try {
 
-			List<EntityValue> entityValues = kb.getEntityValues();
+			List<Entity> entities = kb.getEntities();
 			
-			List<EntityValue> entityInCat = new ArrayList<>();
+			List<Entity> entityInCat = new ArrayList<>();
 
-			if (entityValues.size() > 0) {
+			if (entities.size() > 0) {
 
-				entityValues.stream().filter(f -> f.getEntity().getName().equals(f.getCategory()))
-						.forEach(entityInCat::add);
+				for (Entity en : entities) {
+					for (EntityValues ev : Arrays.asList(en.getValues())) {
+							if (ev.getName().equals(en.getName())) {
+								entityInCat.add(en);
+							}
+					}
+				}
 				
 				entityInCat.forEach(e -> {
 					LOGGER.info("Entity (" + e.getName() + ") in category", e.getName(), e);
 				});
-				
-				
 
 			} else {
 				LOGGER.info("Entities equals 0");
