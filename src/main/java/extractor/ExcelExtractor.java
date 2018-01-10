@@ -129,7 +129,7 @@ public class ExcelExtractor {
 			for (int i = 1; i <= rows; i++) {
 				Row row = sheet.getRow(i);
 
-				if (row != null) {
+				if (row != null && !ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_CONTENT_INTENTION).equals("")) {
 					
 					Intention in = new Intention();
 
@@ -169,9 +169,9 @@ public class ExcelExtractor {
 
 				if (row != null) {
 
-					String currentIntention = StringUtil.removeSpecialCharacters(ExcelUtil
+					String currentIntention = ExcelUtil
 							.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_INTENTION_NAME).trim()
-							.toLowerCase());
+							.toLowerCase().trim();
 
 					if (intention.getName().trim().toLowerCase().equals(currentIntention)) {
 
@@ -224,7 +224,7 @@ public class ExcelExtractor {
 		if (in.getEntities().size() == 0) {
 			key = StringUtil.removeSpecialCharacters(in.getName()).replace(" ", "_");
 		} else {
-			key = in.getName().toLowerCase().replace(" ", "_") + ExtratorConstants.SEPARATION_CHAR + entities.stream()
+			key = StringUtil.removeSpecialCharacters(in.getName().toLowerCase().replace(" ", "_")) + ExtratorConstants.SEPARATION_CHAR + entities.stream()
 					.map(n -> StringUtil.removeSpecialCharacters(n.getName().replace(" ", "_"))).collect(Collectors.joining(ExtratorConstants.SEPARATION_CHAR));
 			;
 		}

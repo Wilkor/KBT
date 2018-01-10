@@ -125,7 +125,7 @@ public class IntentionEntityValidator {
 	// }
 
 	private static List<Intention> searchIntentions(List<Intention> ints, String key) throws Exception {
-		return ints.stream().filter(b -> b.getKey().equals(key.toLowerCase())).collect(Collectors.toList());
+		return ints.stream().filter(b -> b.getKey().toLowerCase().replace(" ", "_").equals(key.toLowerCase().replace(" ", "_"))).collect(Collectors.toList());
 	}
 
 }
