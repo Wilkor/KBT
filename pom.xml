@@ -5,7 +5,7 @@
 
 	<groupId>br.com.kbt</groupId>
 	<artifactId>KBT</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 	<packaging>jar</packaging>
 
 	<parent>
