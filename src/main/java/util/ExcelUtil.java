@@ -223,7 +223,10 @@ public class ExcelUtil {
 
 		if (workbook != null && row != null) {
 			for (int i = cellIndexBegin; i <= cellIndexEnd; i++) {
-				listReturn.add(getCellValueGeneric(workbook, row, i).toString());
+				String cellValue = getCellValueGeneric(workbook, row, i).toString();
+				if(!org.limeprotocol.util.StringUtils.isNullOrEmpty(cellValue)) {
+					listReturn.add(getCellValueGeneric(workbook, row, i).toString());
+				}
 			}
 		}
 		return listReturn;

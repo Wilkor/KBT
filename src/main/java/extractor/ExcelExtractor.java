@@ -2,6 +2,7 @@ package extractor;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -93,18 +94,29 @@ public class ExcelExtractor {
 				if (row != null) {
 
 					Entity ent = new Entity();
-
-					ent.setName(StringUtil.removeSpecialCharacters(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY)));
-
 					EntityValues ev = ent.new EntityValues();
-					ev.setName(StringUtil.removeSpecialCharacters(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE)));
+					List<Entity.EntityValues> entityValues = new ArrayList<>();
+
+					List<Entity> entitiesList = kB.getEntities().stream().filter(b -> b.getName().equalsIgnoreCase(StringUtil.formatString(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY)))).collect(Collectors.toList());
+					
+					if(entitiesList != null && entitiesList.size() > 0) {
+						ent = entitiesList.get(0);
+						entityValues = Arrays.stream(ent.getValues()).collect(Collectors.toList());
+					}
+					else {
+						ent.setName(StringUtil.formatString(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY)));
+					}
+					
+					
+					ev.setName(StringUtil.formatString(ExcelUtil.getCellText(workbook, row, ExtratorConstants.CELL_INDEX_ENTITY_VALUE)));
 
 					ev.setSynonymous(
 							ExcelUtil.getValuesTextBetweenColumns(workbook, row, ExtratorConstants.SINONIMOS_CELL_BEGIN,
 									ExtratorConstants.SINONIMOS_CELL_END).stream().toArray(String[]::new));
 
-					EntityValues[] evs = { ev };
-					ent.setValues(evs);
+					entityValues.add(ev);
+					
+					ent.setValues(entityValues.toArray(new Entity.EntityValues[entityValues.size()]));
 
 					kB.add(ent);
 
